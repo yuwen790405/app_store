@@ -1,5 +1,5 @@
 {
   "gooddata_project_creation_token" : "",
-  "gooddata_project_spec_uri"       : "https://gist.github.com/fluke777/8830288/raw/4147ab4550fab5ce910d920d8d5bb149314e15fc/model.rb",
+  "gooddata_project_spec_uri"       : "http://bit.ly/sample-gooddata-rb-model",
   "gooddata_projec_spec_type"       : "rb"
 }
