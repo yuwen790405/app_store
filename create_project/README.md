@@ -1,4 +1,4 @@
-= Build Project Brick
+#Build Project Brick
 
 Brick that builds a project (model, reports, data) for you based on a spec. Of course you can use other tools like LDM modeler to do the same work but doing it programmatically has several advantages.
 
