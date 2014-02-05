@@ -28,4 +28,3 @@ Basically the same thing as with Ruby but JSON is just a data structure and you 
       "gooddata_project_spec_uri"       : "https://gist.github.com/fluke777/8830288/raw/4147ab4550fab5ce910d920d8d5bb149314e15fc/model.json",
       "gooddata_projec_spec_type"       : "json"
     }
-    
