@@ -1,7 +1,9 @@
 {
-  "name" : "create_project_brick",
-  "version" : "0.0.1",
-  "category" : "modelling"
+  "name"       : "create_project_brick",
+  "version"    : "0.0.1",
+  "category"   : "modelling_tools",
+  "language"   : "ruby",
+  "tags"       : "ruby moddelling project_creation",
   "parameters" : [
     {
       "name"        : "gooddata_project_creation_token",
