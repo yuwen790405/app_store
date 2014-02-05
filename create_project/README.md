@@ -7,9 +7,9 @@ Brick that builds a project (model, reports, data) for you based on a spec. Of c
 * git (SCM) friendly
 * easily shareable
 
-== Examples
+##Examples
 
-=== Create based on the ruby spec
+###Create based on the ruby spec
 Ruby spec is the most flexible way how to specify a project. It is programmable on top of all the benefits JSON spec would offer. The most important thing in params is to correctly specify the type of the source.
 
     {
@@ -20,7 +20,7 @@ Ruby spec is the most flexible way how to specify a project. It is programmable 
 
 Have a look at the sdk site for tutorial how to create a model using ruby DSL.
 
-=== Create based on the json spec
+###Create based on the json spec
 Basically the same thing as with Ruby but JSON is just a data structure and you cannot program it which might be useful at times. The biggest difference is in providing different type
 
     {
