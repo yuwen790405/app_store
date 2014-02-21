@@ -5,11 +5,13 @@ module GoodData::Bricks
   class HelloWorldBrick
 
     def call(params)
-      logger = Logger.new(params[:GDC_LOGGER_FILE])
+      logger = Logger.new(STDOUT)
       logger.info "Hello world"
+      logger.info params
     end
 
   end
 end
 
-GoodData::Bricks::HelloWorldBrick.new
+b = GoodData::Bricks::HelloWorldBrick.new
+b.call($SCRIPT_PARAMS)

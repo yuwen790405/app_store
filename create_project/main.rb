@@ -3,8 +3,10 @@ require './project_brick'
 
 include GoodData::Bricks
 
-GoodData::Bricks::Pipeline.prepare([
+p = GoodData::Bricks::Pipeline.prepare([
   LoggerMiddleware,
   BenchMiddleware,
   GoodDataMiddleware,
   CreateProjectBrick])
+
+p.call($SCRIPT_PARAMS)
