@@ -1,0 +1,65 @@
+<!--Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>GoodData - Ruby Executors</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link href="css/cover.css" rel="stylesheet">
+
+    <meta name="author" content="GoodData">
+    <script src="js/jquery-1.10.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/showdown.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/handlebars-1.0.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/ember-1.0.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/ember-data-beta-1.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h1 style="font-color:000000">Apps</h1>
+            <p> Ruby executors, here to help. </p>
+            <div class="container" align="pull-right">
+                
+            </div>
+        <div class="container theme-showcase" align="center" role="main">
+             <script type="text/x-handlebars" id="application">
+                     {{#if isLoaded}}
+                         <div class="container theme-showcase" align="center" role="main">
+                             {{#each app in apps}}
+                              <div class="col-sm-6 col-md-3">
+                                 <div class="thumbnail">
+                                         <div class="caption">
+                                             <h4 class="lead">{{app.name}}</h4>
+                                             <p>{{app.tags}}</p>
+                                             <p align="center"><button class="btn btn-primary" role="button" {{actions 'installApp'}}>Install</button></p>
+                                         </div>
+                                 </div>
+                             </div>
+                             {{/each}}
+                             <div class="col-sm-3 col-md-5" align="center">
+                                 <div class="thumbnail">
+                                         <div class="caption">
+                                             <h4 class="lead">Have an app idea?</h4>
+                                             <p align="center"><a href="#" class="btn" role="button">Submit Application</a></p>
+                                         </div>
+                                 </div>
+                             </div>
+                         </div>
+                     {{else}}
+                         Loading...
+                     {{/if}}
+
+                 {{outlet}}
+             </script>
+        </div>
+    </div>
+    </div>
+</body>
+</html>
