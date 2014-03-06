@@ -7,23 +7,23 @@
   "parameters" : [
     {
       "name"        : "gooddata_project_creation_token",
-      "description" : "Token needed for creation of the project. Based on that we can attribute projects to customers."
+      "description" : "Token needed for creation of the project. Based on that we can attribute projects to customers.",
       "type"        : "string",
       "mandatory"   : true
     },
     {
       "name"        : "gooddata_project_spec_uri",
-      "description" : "Tells us where the specification lives. It can be either URI or a local path."
+      "description" : "Tells us where the specification lives. It can be either URI or a local path.",
       "type"        : "string"
     },
     {
       "name"        : "gooddata_projec_spec_type",
-      "description" : "Tells us what type of the specification we have. Currently supported are \"rb\" and \"json\"."
+      "description" : "Tells us what type of the specification we have. Currently supported are \"rb\" and \"json\".",
       "type"        : "string"
     },
     {
       "name"        : "gooddata_project_spec",
-      "description" : "Specification can be provided inline using JSON syntax."
+      "description" : "Specification can be provided inline using JSON syntax.",
       "type"        : "string"
     }
   ]
