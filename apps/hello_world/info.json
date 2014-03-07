@@ -1,5 +1,5 @@
 {
-  "name"       : "load_data_brick",
+  "name"       : "hello_world",
   "version"    : "0.0.1",
   "category"   : "modelling_tools",
   "language"   : "ruby",
