@@ -9,7 +9,7 @@ require 'pry'
 class AppBuilder
     
     @@apps = []
-    @@apps_loaded = 0
+    @@index = 0
 
     def renderIndex(apps)
       @apps = apps
@@ -38,7 +38,8 @@ class AppBuilder
           Dir.mkdir('pages')
           renderIndex(@apps)
         end
-      rescue IOError => e
+      rescue NoMethodError
+        pp "=> Unable to generate index page due to corrupt info.json in apps."
       ensure
         page.close unless page == nil
       end
@@ -82,12 +83,20 @@ class AppBuilder
           page.puts '<a href="'+@app_name+'" class="btn btn-lg btn-default">Install</a></div>'
           page.puts '</div'
           page.puts footer
-          @@apps_loaded += 1 
+          pp "=> App Published: "+@app_name
         else
           Dir.mkdir('pages')
           renderApp(@app_page)
         end
       rescue IOError => e
+        pp @app_page['name']+'=> Unable to write to disk, please check your permissions or run the build method with sudo.'
+        pp e.backtrace
+        pp e.message
+      rescue TypeError => type
+        pp "=> Error loading info.json. \n JSON => #{app_page}"
+        pp type.backtrace
+        pp type.message
+
       ensure
         page.close unless page == nil
       end
@@ -100,13 +109,15 @@ class AppBuilder
           @@apps << app
         end
       end
-      puts "Apps Found: #{@@apps.length}"
-      @@apps.each{ |app|         
+     
+      @@apps.each{ |app|
         renderApp(app)
-        puts "=> App Published: #{app['name']}"
       }
       renderIndex(@@apps)
+      puts "Apps Found: #{@@apps.length}"
+     
     end
+
     def findApps      
       apps = []
       Find.find('../apps/') do |path|
