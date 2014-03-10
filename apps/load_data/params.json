@@ -1,4 +1,4 @@
 {
-  "load_data_brick_dataset" : "dataset_name",
-  "load_data_brick_path"  : "path_to_file"
+  "load_data_brick_dataset" : "",
+  "load_data_brick_path"  : ""
 }

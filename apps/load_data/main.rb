@@ -16,9 +16,8 @@ module GoodData::Bricks
       path = params[:load_data_brick_path]
       fail "You need to have token to be able to create a project" if path.nil? || path.empty?
 
-
       manifest = JSON.parse(GoodData::ProjectMetadata["manifest_#{dataset}"])
-      
+
       GoodData::Model::upload_data(path, manifest)
 
     end

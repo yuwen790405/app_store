@@ -1,5 +1,5 @@
 {
   "gooddata_project_creation_token" : "",
-  "gooddata_project_spec_uri"       : "http://bit.ly/sample-gooddata-rb-model",
-  "gooddata_projec_spec_type"       : "rb"
+  "gooddata_project_spec_uri"       : "",
+  "gooddata_projec_spec_type"       : ""
 }

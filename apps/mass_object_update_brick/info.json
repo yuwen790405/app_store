@@ -1,0 +1,15 @@
+{
+  "name"       : "mass_object_update_brick",
+  "version"    : "0.0.1",
+  "category"   : "admin_tools",
+  "language"   : "ruby",
+  "tags"       : "ruby export objects",
+  "parameters" : [
+    {
+      "name"        : "mass_object_update_input_file",
+      "description" : "Path to file where to read the values from"
+      "type"        : "string",
+      "mandatory"   : true
+    }
+  ]
+}

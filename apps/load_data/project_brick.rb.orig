@@ -2,7 +2,7 @@ require 'open-uri'
 
 module GoodData::Bricks
 
-  class CreateProjectBrick < GoodData::Bricks::Brick
+  class UploadDataBrick < GoodData::Bricks::Brick
 
     def version
       "0.0.1"
