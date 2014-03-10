@@ -3,7 +3,8 @@
   "version"    : "0.0.1",
   "category"   : "modelling_tools",
   "language"   : "ruby",
-  "tags"       : "ruby load data project_",
+  "tags"       : "ruby load data project",
+  "description" : "This brick will load data into a dataset of the project.",
   "parameters" : [
     {
       "name"        : "load_data_brick_dataset",

@@ -4,6 +4,7 @@
   "category"   : "modelling_tools",
   "language"   : "ruby",
   "tags"       : "ruby load data project_",
+  "description" : "",
   "parameters" : [
     {
       "name"        : "load_data_brick_dataset",
