@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+  <head>
+    <title><%= app_title %></title>
+  </head>
+  <body>
+    <div align="center" class="container">
+      <p align="center" class="small">
+        <kbd>Version <%= app_version %></kbd>
+      </p>
+      <h1 class="cover-heading">
+        <%= app_title %>
+      </h1>
+      <p class="lead">
+        <%= app_tags %>
+      </p>
+      <h3>
+        Description
+      </h3>
+      <p align="center">
+        <%= app_description %>
+      </p>
+      <h3>Parameters</h3>
+      <table>
+        <tr>
+          <td>
+            Name
+          </td>
+          <td>
+            Description
+          </td>
+          <td>
+            Mandatory
+          </td>
+        </tr>
+        <% for param in app_parameters %>
+          <tr>
+            <td>
+              <%= param["name"] %>
+            </td>
+            <td>
+              <%= param["description"] %>
+            </td>
+            <td>
+              <%= param["mandatory"] || false %>
+            </td>
+          </tr>
+         <% end %>
+      </table>
+
+      <h3>Run instructions</h3>
+      </p>
+        <pre>
+          cd app_store/apps;
+          bin/gooddata -Ulogin -Ppass -p PROJECT_PID run_ruby --dir <%= app_name %> --params <%= app_name %>/params.json --name\"<%= app_title %>\" --remote
+        </pre>
+    </div>
+  </body>
+</html>
