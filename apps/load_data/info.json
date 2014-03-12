@@ -1,10 +1,13 @@
 {
+  "is_live"    : true,
   "name"       : "load_data_brick",
+  "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
+  "created"    : "03/10/2014",
   "version"    : "0.0.1",
   "category"   : "modelling_tools",
   "language"   : "ruby",
   "tags"       : "ruby load data project_",
-  "description" : "",
+  "description" : "...",
   "parameters" : [
     {
       "name"        : "load_data_brick_dataset",

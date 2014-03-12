@@ -1,13 +1,17 @@
 {
+  "is_live"    : true,
   "name"       : "mass_object_update_brick",
+  "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
+  "created"    : "03/10/2014",
   "version"    : "0.0.1",
   "category"   : "admin_tools",
   "language"   : "ruby",
   "tags"       : "ruby export objects",
+  "description" : "...",
   "parameters" : [
     {
       "name"        : "mass_object_update_input_file",
-      "description" : "Path to file where to read the values from"
+      "description" : "Path to file where to read the values from",
       "type"        : "string",
       "mandatory"   : true
     }

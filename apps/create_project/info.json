@@ -1,10 +1,12 @@
 {
-  "name"       : "create_project_brick",
+  "is_live"    : true,
+  "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
+  "created"    : "03/10/2014",
   "version"    : "0.0.1",
   "category"   : "modelling_tools",
   "language"   : "ruby",
   "tags"       : "ruby moddelling project_creation",
-  "description" : "",
+  "description" : "...",
   "parameters" : [
     {
       "name"        : "gooddata_project_creation_token",
