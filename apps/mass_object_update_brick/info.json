@@ -7,7 +7,7 @@
   "parameters" : [
     {
       "name"        : "mass_object_update_input_file",
-      "description" : "Path to file where to read the values from"
+      "description" : "Path to file where to read the values from",
       "type"        : "string",
       "mandatory"   : true
     }

@@ -7,14 +7,14 @@
   "parameters" : [
     {
       "name"        : "download_objects_type",
-      "description" : "Can contain values 'atribute', 'metric', 'fact', 'all'. By specifying you can constrain the type of objects being exported."
+      "description" : "Can contain values 'atribute', 'metric', 'fact', 'all'. By specifying you can constrain the type of objects being exported.",
       "default"     : "all",
       "type"        : "string",
       "mandatory"   : false
     },
     {
       "name"        : "download_objects_output_file",
-      "description" : "Path to file where to store the results"
+      "description" : "Path to file where to store the results",
       "type"        : "string",
       "mandatory"   : true
     }

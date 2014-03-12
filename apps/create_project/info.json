@@ -4,7 +4,8 @@
   "category"   : "modelling_tools",
   "language"   : "ruby",
   "tags"       : "ruby moddelling project_creation",
-  "description" : "",
+  "description" : "This is a dummy description",
+  "is_live"    : true,
   "parameters" : [
     {
       "name"        : "gooddata_project_creation_token",
