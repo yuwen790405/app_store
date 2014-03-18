@@ -14,6 +14,7 @@ class AppBuilder
     apps_root = root + "../../apps/*/info.json"
 
     apps = Dir.glob(apps_root).map { |path| JSON.parse(File.read(path)) }
+
     live_apps = apps.find_all { |app| app["is_live"] }
 
     live_apps.each{ |app| render_app(root, app) }
@@ -30,7 +31,7 @@ class AppBuilder
       File.open("#{app['name']}.html", 'w') do |f|
         f.puts eruby.result({
           :app_name         => app['name'],
-          :app_title        => app['name'],
+          :app_title        => app['title'],
           :app_tags         => app['tags'],
           :app_version      => app['version'],
           :app_description  => app['description'],
