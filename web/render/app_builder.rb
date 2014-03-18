@@ -1,4 +1,4 @@
-# Renders HTML page of all apps bas on 
+# Renders HTML page of all apps bas on
 require 'pp'
 require 'json'
 require 'pry'
@@ -30,7 +30,7 @@ class AppBuilder
       File.open("#{app['name']}.html", 'w') do |f|
         f.puts eruby.result({
           :app_name         => app['name'],
-          :app_title        => app['name'].titleize,
+          :app_title        => app['name'],
           :app_tags         => app['tags'],
           :app_version      => app['version'],
           :app_description  => app['description'],

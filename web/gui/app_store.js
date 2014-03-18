@@ -1,10 +1,10 @@
-/* 
+/*
 ######################################################################
 Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 Author: patrick.mcconlogue@gooddata.com (thnkr)
 ######################################################################
 
-Todo: 
+Todo:
 -- Thread processes based on app directory to avoid fatal loading error when apps do not contain 'info.json'.
 
 */
@@ -12,7 +12,7 @@ var fs = require('fs');
 var express = require('express');
 var events = require('events');
 var e = new events.EventEmitter();
-                
+
 process.on('uncauchtException', function(err){
     console.log(err);
 });
@@ -32,13 +32,13 @@ _app_dirs = [];
 _store = {
 
     loadApps: function() {
-        
-        dirs = fs.readdirSync('../apps');
 
-        _app_dirs = dirs; 
+        dirs = fs.readdirSync('../../apps');
+
+        _app_dirs = dirs;
 
             for(i=0;i<dirs.length;i++){
-                
+
                 app_path = '../apps/'+dirs[i];
 
                 fs.readFile(app_path+'/info.json', function(err, data){
@@ -52,11 +52,11 @@ _store = {
 
                         console.log('Apps loaded: '+_status.apps_loaded);
                         e.emit('apps');
-                    
+
                     }
 
                 });
-            }  
+            }
     },
 
     server: function()  {
@@ -70,7 +70,6 @@ _store = {
         app.use(express.bodyParser());
 
         app.engine('html', require('ejs').renderFile);
-        
         app.get('/', function(req, res){
             res.render('index.html', { 
                 user:'hello', 
