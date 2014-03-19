@@ -71,7 +71,7 @@
       <div class="site-wrapper-inner">
       </p>
       <div class="alert alert-success" id="installing">
-        <p>Installing <%= app_title %>...</p>
+        Installing <%= app_title %>...
       </div>
         <div style="float:right;" class="well">
           <div class="media">
@@ -80,7 +80,7 @@
             </a>
             <div class="media-body">
               <br>
-              <div class="media-heading"><a class="btn btn-info" id="install"><i class="icon-download icon-white"></i> Install App</a></div>
+              <div class="media-heading"><button class="btn btn-info" id="install"><i class="icon-download icon-white"></i> Install App</button></div>
               <small><kbd><%= app_title %><br>
                 Version <%= app_version %></kbd></small>
             </div>
@@ -146,10 +146,10 @@
               $("#install").text('Installing...').attr("disabled", true);
               $("div#installing").show(500);
               setTimeout(function() {
-                $('#install').text('Installed');
-                $("div#installing").text('Running application...');
+                $("div#installing").text('Deploying application...');
                 setTimeout(function()  {
-                  $("div#installing").text('Success.');
+                  $("div#installing").text('Deploying application...success.');
+                  $("#install").text('Installed');
                   $("div#installing").hide(500);
                 },1000);
               }, 2500);
