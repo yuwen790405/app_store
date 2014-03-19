@@ -1,5 +1,5 @@
 {
-  "is_live"    : true,
+  "is_live"    : false,
   "name"       : "hello_world",
   "title"       : "Hello World",
   "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },

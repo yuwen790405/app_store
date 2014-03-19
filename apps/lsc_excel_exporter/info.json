@@ -1,0 +1,20 @@
+{
+  "is_live"    : true,
+  "name"       : "lsc_excel_exporter",
+  "title"       : "Excel Exporter",
+  "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
+  "created"    : "03/10/2014",
+  "version"    : "1.0.0",
+  "category"   : "admin_tools",
+  "language"   : "ruby",
+  "tags"       : "excel import tool",
+  "description" : "Easily export Excel files (xls, xslx, csv) to your GoodData project. Excel Exporter also supports user privalages and automatically integrates with middleware.",
+  "parameters" : [
+    {
+      "name"        : "excel_target_file",
+      "description" : "Path to file to import.",
+      "type"        : "string",
+      "mandatory"   : true
+    }
+  ]
+}
