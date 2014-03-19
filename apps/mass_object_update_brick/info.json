@@ -1,13 +1,14 @@
 {
   "is_live"    : true,
   "name"       : "mass_object_update_brick",
+  "title"       : "Mass Object Update Brick",
   "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
   "created"    : "03/10/2014",
   "version"    : "0.0.1",
   "category"   : "admin_tools",
   "language"   : "ruby",
   "tags"       : "ruby export objects",
-  "description" : "...",
+  "description" : "This app offers global update to all data sources within your project. Once installed, you can delegate tasks to be run on a schedule including custom scripts, external APIs requests, and read/writes.",
   "parameters" : [
     {
       "name"        : "mass_object_update_input_file",

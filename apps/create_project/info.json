@@ -1,12 +1,14 @@
 {
   "is_live"    : true,
+  "name"       : "create_project_brick",
+  "title"      : "iCreate",
   "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
   "created"    : "03/10/2014",
-  "version"    : "0.0.1",
-  "category"   : "modelling_tools",
+  "version"    : "1.0.1",
+  "category"   : "modeling_tools",
   "language"   : "ruby",
-  "tags"       : "ruby moddelling project_creation",
-  "description" : "This is a dummy description",
+  "tags"       : "ruby modeling project creation",
+  "description" : "App that builds a project (model, reports, data) for you based on a spec. Of course you can use other tools like LDM modeler to do the same work but doing it programmatically has several advantages.",
   "is_live"    : true,
   "parameters" : [
     {

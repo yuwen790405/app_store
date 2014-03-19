@@ -1,0 +1,20 @@
+{
+  "is_live"    : true,
+  "name"       : "salesforce_brick",
+  "title"       : "Salesforce",
+  "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
+  "created"    : "03/10/2014",
+  "version"    : "1.0",
+  "category"   : "admin_tools",
+  "language"   : "ruby",
+  "tags"       : "saleforce sychronization tool",
+  "description" : "...",
+  "parameters" : [
+    {
+      "name"        : "salesforce_credentials_env",
+      "description" : "Now you can easily integrate Salesforce data into you Good Data project! The SalesForce app offers immediate data loading and parsing, including user managed to safely integrate with your project. Pipe information straight from CloudConnect, or you can run this app independantly as a service. Happy selling! ",
+      "type"        : "string",
+      "mandatory"   : true
+    }
+  ]
+}

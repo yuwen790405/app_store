@@ -1,13 +1,14 @@
 {
   "is_live"    : true,
   "name"       : "download_objects_brick",
+  "title"       : "Download Objects",
   "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
   "created"    : "03/10/2014",
-  "version"    : "0.0.1",
+  "version"    : "0.9.3",
   "category"   : "admin_tools",
   "language"   : "ruby",
   "tags"       : "ruby export objects",
-  "description" : "...",
+  "description" : "This app is designed to automate workflows where you find yourself downloading from many sources. Download Objects gathers a list of all objects associated with your project and exports them to middleware for processing and updating.",
   "parameters" : [
     {
       "name"        : "download_objects_type",

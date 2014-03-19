@@ -1,0 +1,20 @@
+{
+  "is_live"    : true,
+  "name"       : "dropbox_brick",
+  "title"       : "Dropbox Sync Tool",
+  "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
+  "created"    : "03/10/2014",
+  "version"    : "1.5",
+  "category"   : "admin_tools",
+  "language"   : "ruby",
+  "tags"       : "dropbox synchronization third party api",
+  "description" : "Adds Dropbox API functionality and user authentication to your GoodData project. This app allows you full access to scheduling, back up, space management, and many other useful import/export tools. For a complete list of the features available please visit www.dropbox.com/developers/sync.",
+  "parameters" : [
+    {
+      "name"        : "dropbox_api_key",
+      "description" : "Path to file where to read the keys.",
+      "type"        : "string",
+      "mandatory"   : true
+    }
+  ]
+}

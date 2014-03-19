@@ -1,13 +1,14 @@
 {
   "is_live"    : true,
   "name"       : "hello_world",
+  "title"       : "Hello World",
   "author"     : { "name" : "Tomas Svarovsky", "email" : "svarovsky@gooddata.com" },
   "created"    : "03/10/2014",
-  "version"    : "0.0.1",
+  "version"    : "1.0.0",
   "category"   : "modelling_tools",
   "language"   : "ruby",
   "tags"       : "ruby load data project",
-  "description" : "This brick will load data into a dataset of the project.",
+  "description" : "This app is an educational tool for project managers demonstrating how to safely integrate Good Data apps without any lasting effects on your data.",
   "parameters" : [
     {
       "name"        : "load_data_brick_dataset",
