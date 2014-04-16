@@ -3,10 +3,9 @@ require 'pry'
 require 'active_support/all'
 require 'csv'
 require 'gooddata'
-require 'aws'
 require './downloader'
 
-# TODO: 
+# TODO:
 
 module GoodData::Bricks
 
@@ -23,7 +22,7 @@ include GoodData::Bricks
 p = GoodData::Bricks::Pipeline.prepare([
   LoggerMiddleware,
   BenchMiddleware,
-  GoodDataMiddleware,
+  #GoodDataMiddleware,
   RestForceMiddleware,
   BulkSalesforceMiddleware,
   SalesForceHistoryBrick])

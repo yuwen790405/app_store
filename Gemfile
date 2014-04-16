@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "gooddata", '0.6.0.pre11'
+gem "gooddata", :path => "../gooddata-ruby" #'0.6.0.pre11',
 gem "twitter"
 gem "pony"
 gem "terminal-table"
