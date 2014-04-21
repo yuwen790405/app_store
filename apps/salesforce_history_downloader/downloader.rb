@@ -27,15 +27,14 @@ module GoodData::Bricks
             :filename => File.absolute_path(name),
           }
 
-
           # write the stuff to the csv
           main_data.map do |u|
-            csv << u.values_at(*obj_fields)
+            # get rid of the weird stuff coming from the api
+            csv << u.values_at(*obj_fields).map {|m| m[0] == {"xsi:nil"=>"true"} ? nil : m[0]}
           end
         end
 
       end
-      # Bacha, puvodne vracelo [] A FUNGOVALO TO
       return downloaded_fields
     end
 
@@ -45,7 +44,25 @@ module GoodData::Bricks
       fields = fields(client, obj)
       q = construct_query(obj, fields)
       res = bulk_client.query(obj, q)
-      data = res.result.records
+      data =  res["batches"].reduce([]) do |r, b|
+        #TODO handle errors:
+=begin
+ {"xmlns"=>"http://www.force.com/2009/06/asyncapi/dataload",
+ "id"=>["751U0000001cdgCIAQ"],
+ "jobId"=>["750U000000187p2IAA"],
+ "state"=>["Failed"],
+ "stateMessage"=>
+  ["InvalidBatch : Failed to process query: INVALID_FIELD:  LastActivityDate, Jigsaw, JigsawCompanyId, AccountSource, SicDesc, CustomerPriority__c                                            ^ ERROR at Row:1:Column:487 No such column 'AccountSource' on entity 'Account'. If you are attempting to use a custom field, be sure to append the '__c' after the custom field name. Please reference your WSDL or the describe call for the appropriate names."],
+ "createdDate"=>["2014-04-21T21:40:28.000Z"],
+ "systemModstamp"=>["2014-04-21T21:40:28.000Z"],
+ "numberRecordsProcessed"=>["0"],
+ "numberRecordsFailed"=>["0"],
+ "totalProcessingTime"=>["0"],
+ "apiActiveProcessingTime"=>["0"],
+ "apexProcessingTime"=>["0"]}
+=end
+        r + b["response"]
+      end
     end
 
     # get the list of fields for an object

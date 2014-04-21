@@ -48,7 +48,7 @@ module GoodData::Bricks
         :username => @params["dss_GDC_USERNAME"],
         :password => @params["dss_GDC_PASSWORD"] do |conn|
           sql_strings.each do |sql|
-            logger.info("Executing sql: #{sql}")
+            logger.info("Executing sql: #{sql}") if logger
             conn.run(sql)
           end
       end

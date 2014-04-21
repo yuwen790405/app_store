@@ -1,11 +1,12 @@
 {
+  "salesforce_client_logger": "yeah",
   "salesforce_username": "cvengros@gooddata.com",
   "salesforce_password": "buhahaha5",
   "salesforce_token": "D98C1CQ3l4GzvzMEKKHgvM1SB",
   "salesforce_client_id": "3MVG9QDx8IX8nP5TCIkVJaz5TTjysV5jnBKX2FluOu0U9Z_Y8mWTHsTlKywFUKYsPpQWWNWjg5yFsxmBC.0nj",
   "salesforce_client_secret": "931268898124987988",
-  "salesforce_objects": ["Opportunity", "Account", "User"],
+  "salesforce_objects": ["Opportunity"],
   "dss_jdbc_url": "jdbc:dss://secure.gooddata.com/gdc/dss/instances/X19ck1Ls6Bb0x9Plc0XRKeeeCyKQ2DnY",
   "dss_GDC_USERNAME": "petr.cvengros+dom@gooddata.com",
-  "dss_GDC_PASSWORD": "bhbhbhbh",
+  "dss_GDC_PASSWORD": "bhbhbhbh"
 }
