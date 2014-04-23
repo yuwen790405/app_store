@@ -130,6 +130,12 @@ module GoodData::Bricks
           next
         end
 
+        # same if source_column_expression given
+        if f["source_column_expression"]
+          columns_sql.push("#{f['source_column_expression']} AS #{csv_column_name}")
+          next
+        end
+
         # if there's something to be evaluated, do it
         if f["source_column_concat"]
           # through the stuff to be concated
