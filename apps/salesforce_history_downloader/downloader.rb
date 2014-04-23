@@ -6,13 +6,26 @@ module GoodData::Bricks
     # DATE_TO = DateTime.now.in_time_zone(TZ).iso8601
 
     # objects = ["Account", "Opportunity", "User", "Contact", "Lead", "Case", "Contract", "Product2", "Task", "Event"]
+    DIRNAME = "tmp"
 
-    # returns a hash object -> what fields have been downloaded
+    # returns a hash objects -> what fields have been downloaded
     def download
-      downloaded_fields = {}
+      downloaded_info = {:objects => {}}
       client = @params["salesforce_client"]
       bulk_client = @params["salesforce_bulk_client"]
       objects = @params["salesforce_objects"]
+
+      # save the information about download - sfdc server
+      instance = bulk_client.instance_eval('@connection').parse_instance
+
+      # TODO would be nice to take from describe call
+      # 1.9.3-p484 :008 > h["urls"]["uiDetailTemplate"]
+      # => "https://na12.salesforce.com/{ID}"
+      downloaded_info[:salesforce_server] = "https://#{instance}.salesforce.com/"
+
+      # create the directory if it doesn't exist
+      Dir.mkdir(DIRNAME) if ! File.directory?(DIRNAME)
+
       objects.each do |obj|
         name = "tmp/#{obj}-#{DateTime.now.to_i.to_s}.csv"
 
@@ -22,20 +35,27 @@ module GoodData::Bricks
           # get the list of fields and write them as a header
           obj_fields = fields(client, obj)
           csv << obj_fields
-          downloaded_fields[obj] = {
-            :columns => obj_fields,
+          downloaded_info[:objects][obj] = {
+            :fields => obj_fields,
             :filename => File.absolute_path(name),
           }
 
           # write the stuff to the csv
           main_data.map do |u|
             # get rid of the weird stuff coming from the api
-            csv << u.values_at(*obj_fields).map {|m| m[0] == {"xsi:nil"=>"true"} ? nil : m[0]}
+            csv_line = u.values_at(*obj_fields).map do |m|
+              if m.kind_of?(Array)
+                m[0] == {"xsi:nil"=>"true"} ? nil : m[0]
+              else
+                m
+              end
+            end
+            csv << csv_line
           end
         end
 
       end
-      return downloaded_fields
+      return downloaded_info
     end
 
     private
@@ -43,25 +63,23 @@ module GoodData::Bricks
     def download_main_dataset(client, bulk_client, obj)
       fields = fields(client, obj)
       q = construct_query(obj, fields)
-      res = bulk_client.query(obj, q)
-      data =  res["batches"].reduce([]) do |r, b|
-        #TODO handle errors:
-=begin
- {"xmlns"=>"http://www.force.com/2009/06/asyncapi/dataload",
- "id"=>["751U0000001cdgCIAQ"],
- "jobId"=>["750U000000187p2IAA"],
- "state"=>["Failed"],
- "stateMessage"=>
-  ["InvalidBatch : Failed to process query: INVALID_FIELD:  LastActivityDate, Jigsaw, JigsawCompanyId, AccountSource, SicDesc, CustomerPriority__c                                            ^ ERROR at Row:1:Column:487 No such column 'AccountSource' on entity 'Account'. If you are attempting to use a custom field, be sure to append the '__c' after the custom field name. Please reference your WSDL or the describe call for the appropriate names."],
- "createdDate"=>["2014-04-21T21:40:28.000Z"],
- "systemModstamp"=>["2014-04-21T21:40:28.000Z"],
- "numberRecordsProcessed"=>["0"],
- "numberRecordsFailed"=>["0"],
- "totalProcessingTime"=>["0"],
- "apiActiveProcessingTime"=>["0"],
- "apexProcessingTime"=>["0"]}
-=end
-        r + b["response"]
+      logger = @params["GDC_LOGGER"]
+      logger.info "Executing soql: #{q}" if logger
+
+      begin
+        # try it with the bulk
+        res = bulk_client.query(obj, q)
+        if res["state"] == ["Failed"]
+          raise "Something went wrong: #{res}"
+        end
+
+        data =  res["batches"].reduce([]) do |r, b|
+          r + b["response"]
+        end
+      rescue
+        logger.warn "Batch download failed. Now downloading through REST api instead" if logger
+        # if not, try the normal api
+        data = client.query(q)
       end
     end
 

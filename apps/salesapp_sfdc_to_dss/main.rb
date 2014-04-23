@@ -6,22 +6,27 @@ include GoodData::Bricks
 
 module GoodData::Bricks
 
-  class SalesForceHistoryMiddleware < GoodData::Bricks::Middleware
+  # Downloading from SFDC
+  class SalesForceDownloaderMiddleware < GoodData::Bricks::Middleware
     def call(params)
-      downloaded_fields = GoodData::Bricks::SalesForceHistoryDownloader.new(params).run
-      @app.call(params.merge(:salesforce_downloaded_fields => downloaded_fields))
+      downloaded_info = GoodData::Bricks::SalesForceHistoryDownloader.new(params).run
+      @app.call(params.merge(:salesforce_downloaded_info => downloaded_info))
     end
   end
 
+  # Saving to DSS
   class SaveToDssBrick
     def call(params)
       executor = GoodData::Bricks::DssExecutor.new(params)
-
+      downloaded_info = params[:salesforce_downloaded_info]
       # create dss tables
-      executor.create_tables(params[:salesforce_downloaded_fields])
+      executor.create_tables(downloaded_info[:objects])
 
       # load the data
-      executor.load_data(params[:salesforce_downloaded_fields])
+      executor.load_data(downloaded_info[:objects])
+
+      # save load info
+      executor.save_download_info(downloaded_info)
 
     end
   end
@@ -32,7 +37,7 @@ p = GoodData::Bricks::Pipeline.prepare([
   BenchMiddleware,
   RestForceMiddleware,
   BulkSalesforceMiddleware,
-  SalesForceHistoryMiddleware,
+  SalesForceDownloaderMiddleware,
   SaveToDssBrick
 ])
 
