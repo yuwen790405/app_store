@@ -70,12 +70,16 @@ module GoodData::Bricks
         columns_sql = columns[:sql]
         columns_gd = columns[:gd]
 
+        # get the sql from file or generate it
+        sql = if ds_structure["extract_sql"]
+          File.open(ds_structure["extract_sql"], 'rb') { |f| f.read }
+        else
+          get_extract_sql(
+            ds_structure["source_table"],
+            columns_sql
+          )
+        end
 
-        # get the sql
-        sql = get_extract_sql(
-          ds_structure["source_table"],
-          columns_sql
-        )
         name = "tmp/#{dataset}-#{DateTime.now.to_i.to_s}.csv"
 
         # open a file to write select results to it
@@ -89,7 +93,11 @@ module GoodData::Bricks
             csv << row_array
           end
         end
+        absolute_path = File.absolute_path(name)
+        ds_structure["csv_filename"] = absolute_path
+        @logger.info("Written results to file #{absolute_path}") if @logger
       end
+      return datasets
     end
 
     def table_has_column(table, column)
@@ -105,15 +113,24 @@ module GoodData::Bricks
     def get_columns(ds_structure)
       columns_sql = []
       columns_gd = []
+
+      custom_sql = ds_structure["extract_sql"]
+
       # go through all the fields of the dataset
       ds_structure["fields"].each do |f|
-        # push the gd identifier to list of csv columns
-        csv_column_name = f["gooddata_identifier"]
+        # push the gd short_identifier to list of csv columns
+        csv_column_name = f["gooddata"]["short_identifier"]
         columns_gd.push(csv_column_name)
 
+        # if the sql is custom we don't push anything to sql columns
+        if custom_sql
+          next
+        end
+
         # if it's optional and it's not in the table, return empty
-        if f["optional"]
-          source_column = f["source_column"]
+        s = f["source"]
+        if s["optional"]
+          source_column = s["column"]
           if ! source_column
             raise "source column must be given for optional: #{f}"
           end
@@ -124,22 +141,26 @@ module GoodData::Bricks
           end
         end
 
+        if !s
+          raise "no source given for field: #{f}"
+        end
+
         # if column name given, push it there directly
-        if f["source_column"]
-          columns_sql.push("#{f['source_column']} AS #{csv_column_name}")
+        if s["column"]
+          columns_sql.push("#{s['column']} AS #{csv_column_name}")
           next
         end
 
         # same if source_column_expression given
-        if f["source_column_expression"]
-          columns_sql.push("#{f['source_column_expression']} AS #{csv_column_name}")
+        if s["column_expression"]
+          columns_sql.push("#{s['column_expression']} AS #{csv_column_name}")
           next
         end
 
         # if there's something to be evaluated, do it
-        if f["source_column_concat"]
+        if s["column_concat"]
           # through the stuff to be concated
-          concat_strings = f["source_column_concat"].map do |c|
+          concat_strings = s["column_concat"].map do |c|
             # if it's a symbol get it from the load params
             if c[0] == ":"
               "'#{@params[:salesforce_downloaded_info][c[1..-1].to_sym]}'"
@@ -151,7 +172,7 @@ module GoodData::Bricks
           columns_sql.push("(#{concat_strings.join(' || ')}) AS #{csv_column_name}")
           next
         end
-        raise "source_column or source_column_concat must be given for #{f}"
+        raise "column or column_concat must be given for #{f}"
       end
       return {
         :sql => columns_sql,
