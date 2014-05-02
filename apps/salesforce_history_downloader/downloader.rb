@@ -33,8 +33,8 @@ module GoodData::Bricks
 
         CSV.open(name, 'w', :force_quotes => true) do |csv|
           # get the list of fields and write them as a header
-          obj_fields = fields(client, obj)
-          csv << obj_fields
+          obj_fields = get_fields(client, obj)
+          csv << obj_fields.map {|f| f[:name]}
           downloaded_info[:objects][obj] = {
             :fields => obj_fields,
             :filename => File.absolute_path(name),
@@ -43,7 +43,7 @@ module GoodData::Bricks
           # write the stuff to the csv
           main_data.map do |u|
             # get rid of the weird stuff coming from the api
-            csv_line = u.values_at(*obj_fields).map do |m|
+            csv_line = u.values_at(*obj_fields.map {|f| f[:name]}).map do |m|
               if m.kind_of?(Array)
                 m[0] == {"xsi:nil"=>"true"} ? nil : m[0]
               else
@@ -61,7 +61,7 @@ module GoodData::Bricks
     private
 
     def download_main_dataset(client, bulk_client, obj)
-      fields = fields(client, obj)
+      fields = get_fields(client, obj)
       q = construct_query(obj, fields)
       logger = @params["GDC_LOGGER"]
       logger.info "Executing soql: #{q}" if logger
@@ -84,15 +84,14 @@ module GoodData::Bricks
     end
 
     # get the list of fields for an object
-    def fields(client, obj)
+    def get_fields(client, obj)
       description = client.describe(obj)
       # return the names of the fields
-      # TODO: return the types as well
-      description.fields.map {|f| f.name}
+      description.fields.map {|f| {:name => f.name, :type => f.type}}
     end
 
     def construct_query(obj, fields)
-      "SELECT #{fields.join(', ')} FROM #{obj}"
+      "SELECT #{fields.map {|f| f[:name]}.join(', ')} FROM #{obj}"
     end
 
   end

@@ -41,11 +41,13 @@ module GoodData::Bricks
       end
     end
 
+    # .each{|t| puts "DROP TABLE dss_#{t};"}
+
     LOAD_INFO_TABLE_NAME = 'meta_loads'
 
     def save_download_info(downloaded_info)
       # create the load table if it doesn't exist yet
-      create_sql = get_create_sql(LOAD_INFO_TABLE_NAME, ['Salesforce_Server'])
+      create_sql = get_create_sql(LOAD_INFO_TABLE_NAME, [{:name => 'Salesforce_Server'}])
       execute(create_sql)
 
       # insert it there
@@ -240,9 +242,19 @@ module GoodData::Bricks
       {"_IS_DELETED" => "boolean NOT NULL DEFAULT FALSE"},
     ]
 
+    TYPE_MAPPING = {
+      "date" => "DATE",
+      "datetime" => "TIMESTAMP",
+      "string" => "VARCHAR(255)",
+      "double" => "DOUBLE PRECISION",
+      "int" => "INTEGER",
+      # Currency TODO
+    }
+
+    DEFAULT_TYPE = "VARCHAR (255)"
+
     def get_create_sql(table, fields)
-      # TODO types
-      fields_string = fields.map{|f| "#{f} VARCHAR(255)"}.join(", ")
+      fields_string = fields.map{|f| "#{f[:name]} #{TYPE_MAPPING[f[:type]] || DEFAULT_TYPE}"}.join(", ")
       hist_columns = HISTORIZATION_COLUMNS.map {|col| "#{col.keys[0]} #{col.values[0]}"}.join(", ")
       return "CREATE TABLE IF NOT EXISTS #{sql_table_name(table)}
       (#{ID_COLUMN.keys[0]} #{ID_COLUMN.values[0]}, #{fields_string}, #{hist_columns})"
@@ -251,7 +263,7 @@ module GoodData::Bricks
     # filename is absolute
     def get_upload_sql(table, fields, filename)
       # TODO fill load id
-      return "COPY #{sql_table_name(table)} (#{fields.join(',')})
+      return "COPY #{sql_table_name(table)} (#{fields.map {|f| f[:name]}.join(',')})
       FROM LOCAL '#{filename}' WITH PARSER GdcCsvParser()
        SKIP 1
       EXCEPTIONS '#{filename}.except.log'

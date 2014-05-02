@@ -5,7 +5,7 @@
   "dss_GDC_USERNAME": "petr.cvengros+dom@gooddata.com",
   "dss_GDC_PASSWORD": "bhbhbhbh",
   "gooddata_datasets": {
-    /* "account": {
+    /*"account": {
       "source_table": "dss_Account",
       "fields": [{
         "gooddata": {
@@ -306,15 +306,19 @@
             "column": "IsActive"
           }
         }]
-    },*/
+    },
     "activity_monitoring": {
       "extract_sql": "sql/activity_monitoring.sql",
       "fields": [{
         "gooddata": {
+          "short_identifier": "activity_id",
+          "type": "anchor"
+        }
+      }, {
+        "gooddata": {
           "short_identifier": "activity_date",
           "type": "date",
           "dataset": "activity",
-          "format": "yyyy-mm-dd"
         }
       }, {
         "gooddata": {
@@ -378,12 +382,209 @@
           "reference": "id"
         }
       }]
-    }/*,
+    },
     "opp_records": {
+      "extract_sql": "sql/opp_records.sql",
+      "fields": [{
+        "gooddata": {
+          "short_identifier": "amount",
+          "type": "fact"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "probability",
+          "type": "fact"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "account_id_id",
+          "type": "reference",
+          "dataset": "account",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "opp_owner_id_id",
+          "type": "reference",
+          "dataset": "opp_owner",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "opportunity_id_id",
+          "type": "reference",
+          "dataset": "opportunity",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "product_id_id",
+          "type": "reference",
+          "dataset": "product",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "stage_id_id",
+          "type": "reference",
+          "dataset": "stage",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "created_date",
+          "type": "date",
+          "dataset": "oppcreated"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "close_date",
+          "type": "date",
+          "dataset": "oppclose"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "forecast_id_id",
+          "type": "reference",
+          "dataset": "forecast",
+          "reference": "id"
+        }
+      }]
     },
     "opp_snapshot": {
-    },
+      "extract_sql": "sql/opp_snapshot.sql",
+      "fields": [{
+        "gooddata": {
+          "short_identifier": "amount",
+          "type": "fact"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "probability",
+          "type": "fact"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "account_id_id",
+          "type": "reference",
+          "dataset": "account",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "opp_owner_id_id",
+          "type": "reference",
+          "dataset": "opp_owner",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "opportunity_id_id",
+          "type": "reference",
+          "dataset": "opportunity",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "product_id_id",
+          "type": "reference",
+          "dataset": "product",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "stage_id_id",
+          "type": "reference",
+          "dataset": "stage",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "snapshot_date",
+          "type": "date",
+          "dataset": "snapshot"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "created_date",
+          "type": "date",
+          "dataset": "oppcreated"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "close_date",
+          "type": "date",
+          "dataset": "oppclose"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "forecast_id_id",
+          "type": "reference",
+          "dataset": "forecast",
+          "reference": "id"
+        }
+      }]
+    },*/
     "stage_history": {
-    }*/
+      "extract_sql": "sql/opp_snapshot.sql",
+      "fields": [{
+        "gooddata": {
+          "short_identifier": "stage_duration",
+          "type": "fact"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "stage_velocity",
+          "type": "fact"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "account_id_id",
+          "type": "reference",
+          "dataset": "account",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "opp_owner_id_id",
+          "type": "reference",
+          "dataset": "opp_owner",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "opportunity_id_id",
+          "type": "reference",
+          "dataset": "opportunity",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "product_id_id",
+          "type": "reference",
+          "dataset": "product",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "stage_id_id",
+          "type": "reference",
+          "dataset": "stage",
+          "reference": "id"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "created_date",
+          "type": "date",
+          "dataset": "oppcreated"
+        }
+      }, {
+        "gooddata": {
+          "short_identifier": "close_date",
+          "type": "date",
+          "dataset": "oppclose"
+        }
+      }]
+    }
   }
 }
