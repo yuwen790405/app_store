@@ -9,34 +9,22 @@ module GoodData::Bricks
     def call(params)
       executor = GoodData::Bricks::DssExecutor.new(params)
 
-      extended_datasets = executor.extract_data(params["gooddata_datasets"])
-      @app.call(params.merge({"gooddata_datasets" => extended_datasets}))
+      extended_datasets = executor.extract_data(params["dataset_mapping"])
+      @app.call(params.merge({"dataset_mapping" => extended_datasets}))
     end
   end
 
   # takes csvs and loads them to gd
   class LoadToGoodDataBrick
     def call(params)
-
-      # get gd-rubygem's representation of the model
-      datasets_repre = params["gooddata_datasets"].map do |ds_name, ds_structure|
-
-        # converting the datasets
-        {:name => ds_name, :columns => ds_structure["fields"].map do |col|
-
-          # converting the columns - leaving all as it is, just short_identifier to name (add the key there)
-          {:name => col["gooddata"]["short_identifier"]}.merge(
-            Hash[col["gooddata"].map {|k,v| [k.to_sym, v]}]
-          )
-        end}
+      if ! params["gooddata_model_url"]
+        raise "missing gooddata_model_url in params"
       end
-
-      model = GoodData::Model::ProjectBlueprint.new({
-        :datasets => datasets_repre
-      })
+      json = RestClient.get(params["gooddata_model_url"])
+      model = GoodData::Model::ProjectBlueprint.from_json(json)
 
       # for each defined dataset
-      params["gooddata_datasets"].each do |dataset, ds_structure|
+      params["dataset_mapping"].each do |dataset, ds_structure|
         # get it from the model and load it
         ds = model.get_dataset(dataset)
         ds.upload(ds_structure["csv_filename"])

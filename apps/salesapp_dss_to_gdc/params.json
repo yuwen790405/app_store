@@ -4,587 +4,169 @@
   "GDC_PASSWORD": "XXXXXX",
   "dss_GDC_USERNAME": "petr.cvengros+dom@gooddata.com",
   "dss_GDC_PASSWORD": "bhbhbhbh",
-  "gooddata_datasets": {
-    /*"account": {
-      "source_table": "dss_Account",
-      "fields": [{
-        "gooddata": {
-          "short_identifier" : "id",
-          "type": "anchor"
+  "gooddata_model_url": "https://gist.githubusercontent.com/cvengros/a85874dd8f8da034c70d/raw/salesapp_model.json",
+  "dataset_mapping": {
+    "account":{
+      "source_table":"dss_Account",
+      "columns":{
+        "id":{
+          "source_column":"Id"
         },
-        "source": {
-          "column" : "Id"
-        }
-      },{
-        "gooddata": {
-          "short_identifier" : "name",
-          "type": "label",
-          "reference": "id"
+        "name":{
+          "source_column":"Name"
         },
-        "source": {
-          "column" : "Name"
-        }
-      },{
-        "gooddata": {
-          "short_identifier" : "url",
-          "type": "label",
-          "reference": "id"
+        "url":{
+          "source_column_concat":[
+            ":salesforce_server",
+            "Id"
+          ]
         },
-        "source": {
-          "column_concat" : [":salesforce_server", "Id"]
+        "region":{
+          "source_column":"ShippingCountry"
         }
-      },{
-        "gooddata": {
-          "short_identifier" : "region",
-          "type": "attribute"
-        },
-        "source": {
-          "column" : "ShippingCountry"
-        }
-      }]
+      }
     },
-    "activity": {
-      "source_table": "dss_Task",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "id",
-          "type": "anchor"
+    "activity":{
+      "source_table":"dss_Task",
+      "columns":{
+        "id":{
+          "source_column":"Id"
         },
-        "source": {
-          "column": "Id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "subject",
-          "type": "label",
-          "reference": "id"
+        "subject":{
+          "source_column":"Subject"
         },
-        "source": {
-          "column": "Subject"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "type",
-          "type": "attribute"
+        "type":{
+          "source_column":"Type",
+          "optional":true
         },
-        "source": {
-          "column": "Type",
-          "optional": true
+        "status":{
+          "source_column":"Status"
         }
-      }, {
-        "gooddata": {
-          "short_identifier": "status",
-          "type": "attribute"
-        },
-        "source": {
-          "column": "Status"
-        }
-      }]
+      }
     },
-    "activity_owner": {
-      "source_table": "dss_User",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "id",
-          "type": "anchor"
+    "activity_owner":{
+      "source_table":"dss_User",
+      "columns":{
+        "id":{
+          "source_column":"Id"
         },
-        "source": {
-          "column": "Id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "name",
-          "type": "label",
-          "reference": "id"
+        "name":{
+          "source_column":"Name"
         },
-        "source": {
-          "column": "Name"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "url",
-          "type": "label",
-          "reference": "id"
+        "url":{
+          "source_column_concat":[
+            ":salesforce_server",
+            "Id"
+          ]
         },
-        "source": {
-          "column_concat": [":salesforce_server", "Id"]
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "department",
-          "type": "attribute"
+        "department":{
+          "source_column":"Department"
         },
-        "source": {
-          "column": "Department"
+        "region":{
+          "source_column":"Division"
         }
-      }, {
-        "gooddata": {
-          "short_identifier": "region",
-          "type": "attribute"
-        },
-        "source": {
-          "column": "Division"
-        }
-      }]
+      }
     },
-    "forecast": {
-      "source_table": "dss_Opportunity",
-      "fields":[{
-        "gooddata": {
-          "short_identifier": "id",
-          "type": "anchor"
-        },
-        "source": {
-          "column": "ForecastCategoryName"
+    "forecast":{
+      "source_table":"dss_Opportunity",
+      "columns":{
+        "id":{
+          "source_column":"ForecastCategoryName"
         }
-      }]
+      }
     },
-    "opportunity": {
-      "source_table": "dss_Opportunity",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "id",
-          "type": "anchor"
+    "opportunity":{
+      "source_table":"dss_Opportunity",
+      "columns":{
+        "id":{
+          "source_column":"Id"
         },
-        "source": {
-          "column": "Id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "name",
-          "type": "label",
-          "reference": "id"
+        "name":{
+          "source_column":"Name"
         },
-        "source": {
-          "column": "Name"
+        "url":{
+          "source_column_concat":[
+            ":salesforce_server",
+            "Id"
+          ]
         }
-      }, {
-        "gooddata": {
-          "short_identifier": "url",
-          "type": "label",
-          "reference": "id"
-        },
-        "source": {
-          "column_concat": [":salesforce_server", "Id"]
-        }
-      }]
+      }
     },
-    "opp_owner": {
-      "source_table": "dss_User",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "id",
-          "type": "anchor"
+    "opp_owner":{
+      "source_table":"dss_User",
+      "columns":{
+        "id":{
+          "source_column":"Id"
         },
-        "source": {
-          "column": "Id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "name",
-          "type": "label",
-          "reference": "id"
+        "name":{
+          "source_column":"Name"
         },
-        "source": {
-          "column": "Name"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "url",
-          "type": "label",
-          "reference": "id"
+        "url":{
+          "source_column_concat":[
+            ":salesforce_server",
+            "Id"
+          ]
         },
-        "source": {
-          "column_concat": [":salesforce_server", "Id"]
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "department",
-          "type": "attribute"
+        "department":{
+          "source_column":"Department"
         },
-        "source": {
-          "column": "Department"
+        "region":{
+          "source_column":"Division"
         }
-      }, {
-        "gooddata": {
-          "short_identifier": "region",
-          "type": "attribute"
-        },
-        "source": {
-          "column": "Division"
-        }
-      }]
+      }
     },
-    "product": {
-      "source_table": "dss_Product2",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "id",
-          "type": "anchor"
+    "product":{
+      "source_table":"dss_Product2",
+      "columns":{
+        "id":{
+          "source_column":"Id"
         },
-        "source": {
-          "column": "Id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "name",
-          "type": "label",
-          "reference": "id"
+        "name":{
+          "source_column":"Name"
         },
-        "source": {
-          "column": "Name"
+        "product_type":{
+          "source_column":"Type",
+          "optional":true
         }
-      }, {
-        "gooddata": {
-          "short_identifier": "product_type",
-          "type": "attribute"
+      }
+    },
+    "stage":{
+      "source_table":"dss_OpportunityStage",
+      "columns":{
+        "is_closed":{
+          "source_column":"IsClosed"
         },
-        "source": {
-          "column": "Type",
-          "optional": true
+        "is_won":{
+          "source_column":"IsWon"
+        },
+        "status":{
+          "source_column_expression":"CASE WHEN isClosed = 'false' THEN 'Open' WHEN isClosed = 'true' AND isWon = 'true' THEN 'Won' ELSE 'Lost' END"
+        },
+        "id":{
+          "source_column":"Id"
+        },
+        "order":{
+          "source_column":"SortOrder"
+        },
+        "name":{
+          "source_column":"MasterLabel"
+        },
+        "is_active":{
+          "source_column":"IsActive"
         }
-      }]
+      }
     },
-    "stage": {
-      "source_table": "dss_OpportunityStage",
-      "fields": [{
-          "gooddata": {
-            "short_identifier": "is_closed",
-            "type": "attribute"
-          },
-          "source": {
-            "column": "IsClosed"
-          }
-        }, {
-          "gooddata": {
-            "short_identifier": "is_won",
-            "type": "attribute"
-          },
-          "source": {
-            "column": "IsWon"
-          }
-        }, {
-          "gooddata": {
-            "short_identifier": "status",
-            "type": "attribute"
-          },
-          "source": {
-            "column_expression": "CASE WHEN isClosed = 'false' THEN 'Open' WHEN isClosed = 'true' AND isWon = 'true' THEN 'Won' ELSE 'Lost' END"
-          }
-        }, {
-          "gooddata": {
-            "short_identifier": "id",
-            "type": "anchor"
-          },
-          "source": {
-            "column": "Id"
-          }
-        }, {
-          "gooddata": {
-            "short_identifier": "order",
-            "type": "label",
-            "reference": "id"
-          },
-          "source": {
-            "column": "SortOrder"
-          }
-        }, {
-          "gooddata": {
-            "short_identifier": "name",
-            "type": "label",
-            "reference": "id"
-          },
-          "source": {
-            "column": "MasterLabel"
-          }
-        }, {
-          "gooddata": {
-            "short_identifier": "is_active",
-            "type": "attribute"
-          },
-          "source": {
-            "column": "IsActive"
-          }
-        }]
+    "activity_monitoring":{
+      "extract_sql":"sql/activity_monitoring.sql"
     },
-    "activity_monitoring": {
-      "extract_sql": "sql/activity_monitoring.sql",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "activity_id",
-          "type": "anchor"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "activity_date",
-          "type": "date",
-          "dataset": "activity",
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opp_created_date",
-          "type": "date",
-          "dataset": "oppcreated"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opp_close_date",
-          "type": "date",
-          "dataset": "oppclose"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "activity_id_id",
-          "type": "reference",
-          "dataset": "activity",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "account_id_id",
-          "type": "reference",
-          "dataset": "account",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opportunity_id_id",
-          "type": "reference",
-          "dataset": "opportunity",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "activity_owner_id_id",
-          "type": "reference",
-          "dataset": "activity_owner",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opp_owner_id_id",
-          "type": "reference",
-          "dataset": "opp_owner",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "product_id_id",
-          "type": "reference",
-          "dataset": "product",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "stage_id_id",
-          "type": "reference",
-          "dataset": "stage",
-          "reference": "id"
-        }
-      }]
+    "opp_records":{
+      "extract_sql":"sql/opp_records.sql"
     },
-    "opp_records": {
-      "extract_sql": "sql/opp_records.sql",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "amount",
-          "type": "fact"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "probability",
-          "type": "fact"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "account_id_id",
-          "type": "reference",
-          "dataset": "account",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opp_owner_id_id",
-          "type": "reference",
-          "dataset": "opp_owner",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opportunity_id_id",
-          "type": "reference",
-          "dataset": "opportunity",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "product_id_id",
-          "type": "reference",
-          "dataset": "product",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "stage_id_id",
-          "type": "reference",
-          "dataset": "stage",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "created_date",
-          "type": "date",
-          "dataset": "oppcreated"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "close_date",
-          "type": "date",
-          "dataset": "oppclose"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "forecast_id_id",
-          "type": "reference",
-          "dataset": "forecast",
-          "reference": "id"
-        }
-      }]
+    "opp_snapshot":{
+      "extract_sql":"sql/opp_snapshot.sql"
     },
-    "opp_snapshot": {
-      "extract_sql": "sql/opp_snapshot.sql",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "amount",
-          "type": "fact"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "probability",
-          "type": "fact"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "account_id_id",
-          "type": "reference",
-          "dataset": "account",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opp_owner_id_id",
-          "type": "reference",
-          "dataset": "opp_owner",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opportunity_id_id",
-          "type": "reference",
-          "dataset": "opportunity",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "product_id_id",
-          "type": "reference",
-          "dataset": "product",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "stage_id_id",
-          "type": "reference",
-          "dataset": "stage",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "snapshot_date",
-          "type": "date",
-          "dataset": "snapshot"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "created_date",
-          "type": "date",
-          "dataset": "oppcreated"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "close_date",
-          "type": "date",
-          "dataset": "oppclose"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "forecast_id_id",
-          "type": "reference",
-          "dataset": "forecast",
-          "reference": "id"
-        }
-      }]
-    },*/
-    "stage_history": {
-      "extract_sql": "sql/opp_snapshot.sql",
-      "fields": [{
-        "gooddata": {
-          "short_identifier": "stage_duration",
-          "type": "fact"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "stage_velocity",
-          "type": "fact"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "account_id_id",
-          "type": "reference",
-          "dataset": "account",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opp_owner_id_id",
-          "type": "reference",
-          "dataset": "opp_owner",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "opportunity_id_id",
-          "type": "reference",
-          "dataset": "opportunity",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "product_id_id",
-          "type": "reference",
-          "dataset": "product",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "stage_id_id",
-          "type": "reference",
-          "dataset": "stage",
-          "reference": "id"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "created_date",
-          "type": "date",
-          "dataset": "oppcreated"
-        }
-      }, {
-        "gooddata": {
-          "short_identifier": "close_date",
-          "type": "date",
-          "dataset": "oppclose"
-        }
-      }]
+    "stage_history":{
+      "extract_sql":"sql/opp_snapshot.sql"
     }
   }
 }

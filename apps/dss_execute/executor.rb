@@ -33,10 +33,16 @@ module GoodData::Bricks
     # table name ->
     #   :fields -> list of columns
     #   :filename -> name of the csv file
-    def load_data(table_hash)
+    def load_data(downloaded_info)
+
+      # save the info and load the tables
+      load_id = save_download_info(downloaded_info)
+
+      table_hash = downloaded_info[:objects]
+
       # load the data
       table_hash.each do |table, table_meta|
-        sql = get_upload_sql(table, table_meta[:fields], table_meta[:filename])
+        sql = get_upload_sql(table, table_meta[:fields], table_meta[:filename], load_id)
         execute(sql)
       end
     end
@@ -45,14 +51,26 @@ module GoodData::Bricks
 
     LOAD_INFO_TABLE_NAME = 'meta_loads'
 
+    # save the info about the download
+    # return the load id
     def save_download_info(downloaded_info)
+      # generate load id
+      load_id = Time.now.to_i
+
       # create the load table if it doesn't exist yet
       create_sql = get_create_sql(LOAD_INFO_TABLE_NAME, [{:name => 'Salesforce_Server'}])
       execute(create_sql)
 
       # insert it there
-      insert_sql = get_insert_sql(sql_table_name(LOAD_INFO_TABLE_NAME), {"Salesforce_Server" => downloaded_info[:salesforce_server]})
+      insert_sql = get_insert_sql(
+        sql_table_name(LOAD_INFO_TABLE_NAME),
+        {
+          "Salesforce_Server" => downloaded_info[:salesforce_server],
+          "_LOAD_ID" => load_id
+        }
+      )
       execute(insert_sql)
+      return load_id
     end
 
     DIRNAME = "tmp"
@@ -118,10 +136,11 @@ module GoodData::Bricks
 
       custom_sql = ds_structure["extract_sql"]
 
+      columns = custom_sql ? {} : ds_structure["columns"]
+
       # go through all the fields of the dataset
-      ds_structure["fields"].each do |f|
+      columns.each do |csv_column_name, s|
         # push the gd short_identifier to list of csv columns
-        csv_column_name = f["gooddata"]["short_identifier"]
         columns_gd.push(csv_column_name)
 
         # if the sql is custom we don't push anything to sql columns
@@ -130,9 +149,8 @@ module GoodData::Bricks
         end
 
         # if it's optional and it's not in the table, return empty
-        s = f["source"]
         if s["optional"]
-          source_column = s["column"]
+          source_column = s["source_column"]
           if ! source_column
             raise "source column must be given for optional: #{f}"
           end
@@ -148,21 +166,21 @@ module GoodData::Bricks
         end
 
         # if column name given, push it there directly
-        if s["column"]
-          columns_sql.push("#{s['column']} AS #{csv_column_name}")
+        if s["source_column"]
+          columns_sql.push("#{s['source_column']} AS #{csv_column_name}")
           next
         end
 
         # same if source_column_expression given
-        if s["column_expression"]
-          columns_sql.push("#{s['column_expression']} AS #{csv_column_name}")
+        if s["source_column_expression"]
+          columns_sql.push("#{s['source_column_expression']} AS #{csv_column_name}")
           next
         end
 
         # if there's something to be evaluated, do it
-        if s["column_concat"]
+        if s["source_column_concat"]
           # through the stuff to be concated
-          concat_strings = s["column_concat"].map do |c|
+          concat_strings = s["source_column_concat"].map do |c|
             # if it's a symbol get it from the load params
             if c[0] == ":"
               "'#{@params[:salesforce_downloaded_info][c[1..-1].to_sym]}'"
@@ -174,7 +192,7 @@ module GoodData::Bricks
           columns_sql.push("(#{concat_strings.join(' || ')}) AS #{csv_column_name}")
           next
         end
-        raise "column or column_concat must be given for #{f}"
+        raise "column or source_column_concat must be given for #{f}"
       end
       return {
         :sql => columns_sql,
@@ -184,7 +202,7 @@ module GoodData::Bricks
 
     def get_load_info
       # get information from the meta table latest row
-      # return it in form column name -> value
+      # return it in form source_column name -> value
       select_sql = get_extract_load_info_sql
       info = {}
       execute_select(select_sql) do |row|
@@ -248,6 +266,7 @@ module GoodData::Bricks
       "string" => "VARCHAR(255)",
       "double" => "DOUBLE PRECISION",
       "int" => "INTEGER",
+      "currency" => "MONEY"
       # Currency TODO
     }
 
@@ -261,9 +280,8 @@ module GoodData::Bricks
     end
 
     # filename is absolute
-    def get_upload_sql(table, fields, filename)
-      # TODO fill load id
-      return "COPY #{sql_table_name(table)} (#{fields.map {|f| f[:name]}.join(',')})
+    def get_upload_sql(table, fields, filename, load_id)
+      return "COPY #{sql_table_name(table)} (#{fields.map {|f| f[:name]}.join(', ')}, _LOAD_ID AS '#{load_id}')
       FROM LOCAL '#{filename}' WITH PARSER GdcCsvParser()
        SKIP 1
       EXCEPTIONS '#{filename}.except.log'

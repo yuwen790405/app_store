@@ -23,11 +23,7 @@ module GoodData::Bricks
       executor.create_tables(downloaded_info[:objects])
 
       # load the data
-      executor.load_data(downloaded_info[:objects])
-
-      # save load info
-      executor.save_download_info(downloaded_info)
-
+      executor.load_data(downloaded_info)
     end
   end
 end
