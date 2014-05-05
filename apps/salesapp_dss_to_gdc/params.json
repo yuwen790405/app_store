@@ -166,7 +166,7 @@
       "extract_sql":"sql/opp_snapshot.sql"
     },
     "stage_history":{
-      "extract_sql":"sql/opp_snapshot.sql"
+      "extract_sql":"sql/stage_history.sql"
     }
   }
 }

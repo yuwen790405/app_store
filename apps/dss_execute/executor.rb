@@ -86,33 +86,47 @@ module GoodData::Bricks
 
       # extract each dataset from vertica
       datasets.each do |dataset, ds_structure|
-        columns = get_columns(ds_structure)
-        columns_sql = columns[:sql]
-        columns_gd = columns[:gd]
 
-        # get the sql from file or generate it
-        sql = if ds_structure["extract_sql"]
-          File.open(ds_structure["extract_sql"], 'rb') { |f| f.read }
+        # if custom sql given
+        if ds_structure["extract_sql"]
+          # get the sql from the file
+          sql = File.open(ds_structure["extract_sql"], 'rb') { |f| f.read }
+          columns_gd = nil
         else
-          get_extract_sql(
+          # get the columns and generate the sql
+          columns = get_columns(ds_structure)
+          columns_gd = columns[:gd]
+          sql = get_extract_sql(
             ds_structure["source_table"],
-            columns_sql
+            columns[:sql]
           )
         end
 
         name = "tmp/#{dataset}-#{DateTime.now.to_i.to_s}.csv"
 
+        # columns of the sql query result
+        sql_columns = nil
+
         # open a file to write select results to it
         CSV.open(name, 'w', :force_quotes => true) do |csv|
-          # write the header there
-          csv << columns_gd
+
+          fetch_handler = lambda do |f|
+            sql_columns = f.columns
+            # write the columns to the csv file as a header
+            csv << sql_columns
+          end
 
           # execute the select and write row by row
-          execute_select(sql) do |row|
-            row_array = columns_gd.map {|col| row[col.downcase.to_sym]}
+          execute_select(sql, fetch_handler) do |row|
+            row_array = sql_columns.map {|col| row[col]}
             csv << row_array
           end
+
+          if columns_gd && (sql_columns != columns_gd.map {|c| c.to_sym})
+            raise "something is weird, the columns of the sql '#{sql_columns}' aren't the same as the given cols '#{columns_gd}' "
+          end
         end
+
         absolute_path = File.absolute_path(name)
         ds_structure["csv_filename"] = absolute_path
         @logger.info("Written results to file #{absolute_path}") if @logger
@@ -129,24 +143,21 @@ module GoodData::Bricks
       return count > 0
     end
 
-    # get columns to be part of the SELECT query
+    # get columns to be part of the SELECT query .. only when sql needs to be generated
     def get_columns(ds_structure)
       columns_sql = []
       columns_gd = []
 
-      custom_sql = ds_structure["extract_sql"]
+      if ds_structure["extract_sql"]
+        raise "something is wrong, generating colums for sql when custom sql given"
+      end
 
-      columns = custom_sql ? {} : ds_structure["columns"]
+      columns = ds_structure["columns"]
 
       # go through all the fields of the dataset
       columns.each do |csv_column_name, s|
         # push the gd short_identifier to list of csv columns
         columns_gd.push(csv_column_name)
-
-        # if the sql is custom we don't push anything to sql columns
-        if custom_sql
-          next
-        end
 
         # if it's optional and it's not in the table, return empty
         if s["optional"]
@@ -221,11 +232,20 @@ module GoodData::Bricks
     end
 
     # executes sql (select), for each row, passes execution to block
-    def execute_select(sql)
+    def execute_select(sql, fetch_handler=nil)
       connect do |connection|
+        # do the query
+        f = connection.fetch(sql)
+
         @logger.info("Executing sql: #{sql}") if @logger
-        return connection.fetch(sql) do |row|
-          yield(row) if block_given?
+        # if handler was passed call it
+        if fetch_handler
+          fetch_handler.call(f)
+        end
+
+        # go throug the rows returned and call the block
+        return f.each do |row|
+          yield(row)
         end
       end
     end
