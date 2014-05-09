@@ -40,10 +40,17 @@ module GoodData::Bricks
 
       table_hash = downloaded_info[:objects]
 
-      # load the data
+      # load the data for each table and each file to be loaded there
       table_hash.each do |table, table_meta|
-        sql = get_upload_sql(table, table_meta[:fields], table_meta[:filename], load_id)
-        execute(sql)
+        table_meta[:filenames].each do |filename|
+          sql = get_upload_sql(table, table_meta[:fields], filename, load_id)
+          execute(sql)
+
+          # if there's something in the reject/except, raise an error
+          if File.size?(get_except_filename(filename)) || File.size?(get_reject_filename(filename))
+            raise "Some of the records were rejected: see #{filename}"
+          end
+        end
       end
     end
 
@@ -286,8 +293,7 @@ module GoodData::Bricks
       "string" => "VARCHAR(255)",
       "double" => "DOUBLE PRECISION",
       "int" => "INTEGER",
-      "currency" => "MONEY"
-      # Currency TODO
+      "currency" => "DECIMAL"
     }
 
     DEFAULT_TYPE = "VARCHAR (255)"
@@ -299,18 +305,26 @@ module GoodData::Bricks
       (#{ID_COLUMN.keys[0]} #{ID_COLUMN.values[0]}, #{fields_string}, #{hist_columns})"
     end
 
+    def get_except_filename(filename)
+      return "#{filename}.except.log"
+    end
+
+    def get_reject_filename(filename)
+      return "#{filename}.reject.log"
+    end
+
     # filename is absolute
     def get_upload_sql(table, fields, filename, load_id)
       return "COPY #{sql_table_name(table)} (#{fields.map {|f| f[:name]}.join(', ')}, _LOAD_ID AS '#{load_id}')
       FROM LOCAL '#{filename}' WITH PARSER GdcCsvParser()
        SKIP 1
-      EXCEPTIONS '#{filename}.except.log'
-      REJECTED DATA '#{filename}.reject.log' "
+      EXCEPTIONS '#{get_except_filename(filename)}'
+      REJECTED DATA '#{get_reject_filename(filename)}' "
     end
 
     def get_extract_sql(table, columns)
       # TODO last snapshot
-      return "SELECT #{columns.join(',')} FROM #{table} WHERE _INSERTED_AT = (SELECT MAX(_INSERTED_AT) FROM #{table})"
+      return "SELECT #{columns.join(',')} FROM #{table} WHERE _INSERTED_AT = (SELECT MAX(_LOAD_ID) FROM #{LOAD_INFO_TABLE_NAME})"
     end
 
     def get_extract_load_info_sql

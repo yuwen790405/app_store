@@ -4,6 +4,11 @@ require '../salesforce_history_downloader/downloader'
 require '../dss_execute/executor'
 include GoodData::Bricks
 
+Restforce.configure do |config|
+  config.api_version = '29.0'
+  config.timeout = 30
+end
+
 module GoodData::Bricks
 
   # Downloading from SFDC

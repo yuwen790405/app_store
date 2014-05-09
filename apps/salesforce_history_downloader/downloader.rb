@@ -16,12 +16,12 @@ module GoodData::Bricks
       objects = @params["salesforce_objects"]
 
       # save the information about download - sfdc server
-      instance = bulk_client.instance_eval('@connection').parse_instance
+      instance = bulk_client.instance_url
 
       # TODO would be nice to take from describe call
       # 1.9.3-p484 :008 > h["urls"]["uiDetailTemplate"]
       # => "https://na12.salesforce.com/{ID}"
-      downloaded_info[:salesforce_server] = "https://#{instance}.salesforce.com/"
+      downloaded_info[:salesforce_server] = instance
 
       # create the directory if it doesn't exist
       Dir.mkdir(DIRNAME) if ! File.directory?(DIRNAME)
@@ -29,28 +29,38 @@ module GoodData::Bricks
       objects.each do |obj|
         name = "tmp/#{obj}-#{DateTime.now.to_i.to_s}.csv"
 
-        main_data = download_main_dataset(client, bulk_client, obj)
+        obj_fields = get_fields(client, obj)
 
-        CSV.open(name, 'w', :force_quotes => true) do |csv|
-          # get the list of fields and write them as a header
-          obj_fields = get_fields(client, obj)
-          csv << obj_fields.map {|f| f[:name]}
+        main_data = download_main_dataset(client, bulk_client, obj, obj_fields)
+
+        # if it's already in files, just write downloaded_info
+        if main_data[:in_files]
           downloaded_info[:objects][obj] = {
             :fields => obj_fields,
-            :filename => File.absolute_path(name),
+            :filenames => main_data[:filenames].map {|f| File.absolute_path(f)},
           }
+        else
+          # otherwise write it to csv
+          CSV.open(name, 'w', :force_quotes => true) do |csv|
+            # get the list of fields and write them as a header
+            csv << obj_fields.map {|f| f[:name]}
+            downloaded_info[:objects][obj] = {
+              :fields => obj_fields,
+              :filenames => [File.absolute_path(name)],
+            }
 
-          # write the stuff to the csv
-          main_data.map do |u|
-            # get rid of the weird stuff coming from the api
-            csv_line = u.values_at(*obj_fields.map {|f| f[:name]}).map do |m|
-              if m.kind_of?(Array)
-                m[0] == {"xsi:nil"=>"true"} ? nil : m[0]
-              else
-                m
+            # write the stuff to the csv
+            main_data.map do |row_hash|
+              # get rid of the weird stuff coming from the api
+              csv_line = row_hash.values_at(*obj_fields.map {|f| f[:name]}).map do |m|
+                if m.kind_of?(Array)
+                  m[0] == {"xsi:nil"=>"true"} ? nil : m[0]
+                else
+                  m
+                end
               end
+              csv << csv_line
             end
-            csv << csv_line
           end
         end
 
@@ -60,26 +70,44 @@ module GoodData::Bricks
 
     private
 
-    def download_main_dataset(client, bulk_client, obj)
-      fields = get_fields(client, obj)
+    def download_main_dataset(client, bulk_client, obj, fields)
       q = construct_query(obj, fields)
       logger = @params["GDC_LOGGER"]
       logger.info "Executing soql: #{q}" if logger
 
       begin
         # try it with the bulk
-        res = bulk_client.query(obj, q)
-        if res["state"] == ["Failed"]
-          raise "Something went wrong: #{res}"
+
+        # start the machinery
+        job = bulk_client.start_query(obj, q)
+        filenames = nil
+
+        loop do
+          # check the status
+          status = job.check_job_status
+          # if finished get the result and we're done
+          if status["finished"]
+            # get the results
+            filenames = job.get_job_results({:directory_path => DIRNAME})
+
+            break
+          end
+          sleep(10)
         end
 
-        data =  res["batches"].reduce([]) do |r, b|
-          r + b["response"]
-        end
-      rescue
+        return {
+          :in_files => true,
+          :filenames => filenames
+        }
+      rescue => e
+        require 'pry'; binding.pry
         logger.warn "Batch download failed. Now downloading through REST api instead" if logger
         # if not, try the normal api
         data = client.query(q)
+        return {
+          :in_files => false,
+          :data => data
+        }
       end
     end
 
