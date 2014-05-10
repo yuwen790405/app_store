@@ -50,7 +50,7 @@ module GoodData::Bricks
             }
 
             # write the stuff to the csv
-            main_data.map do |row_hash|
+            main_data[:data].map do |row_hash|
               # get rid of the weird stuff coming from the api
               csv_line = row_hash.values_at(*obj_fields.map {|f| f[:name]}).map do |m|
                 if m.kind_of?(Array)

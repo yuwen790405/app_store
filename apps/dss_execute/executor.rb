@@ -315,11 +315,12 @@ module GoodData::Bricks
 
     # filename is absolute
     def get_upload_sql(table, fields, filename, load_id)
-      return "COPY #{sql_table_name(table)} (#{fields.map {|f| f[:name]}.join(', ')}, _LOAD_ID AS '#{load_id}')
+      return %Q{COPY #{sql_table_name(table)} (#{fields.map {|f| f[:name]}.join(', ')}, _LOAD_ID AS '#{load_id}')
       FROM LOCAL '#{filename}' WITH PARSER GdcCsvParser()
+      ESCAPE AS '"'
        SKIP 1
       EXCEPTIONS '#{get_except_filename(filename)}'
-      REJECTED DATA '#{get_reject_filename(filename)}' "
+      REJECTED DATA '#{get_reject_filename(filename)}' }
     end
 
     def get_extract_sql(table, columns)
