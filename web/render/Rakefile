@@ -1,0 +1,46 @@
+require 'json'
+require 'json-schema'
+require 'pry'
+require 'pp'
+require 'fileutils'
+require 'pathname'
+
+brick_info_schema = {
+  "type" => "object",
+  "required" => ["name","version","language"],
+  "properties" => {
+    "name" => {"type" => "string"},
+    "version" => {"type" => "string"},
+    "category" => {"type" => "string"},
+    "language" => {"type" => "string"},
+    "description" => { "type" => "string"},
+    "tags" => {"type" => "string"},
+    "is_live" => {"type" => "boolean"}
+  },
+}
+
+desc 'Gets info.json from /apps/ and validates.'
+task :default do
+  root = Pathname(__FILE__).expand_path.dirname
+  bricks_root = root + "../../apps/*/info.json"
+
+  production_bricks = []
+  bricks = Dir.glob(bricks_root).map do |path|
+    brick = JSON.parse(File.read(path))
+    if JSON::Validator.validate!(brick_info_schema, brick)
+      production_bricks << brick
+    else
+      fail JSON::Schema::ValidationError
+    end
+  end
+
+  task(:write).invoke(production_bricks)
+end
+
+desc 'Writes JSON file to location.'
+task :write, :file do |w, bricks|
+  File.open("bricks.json", 'w') do |f|
+    f.puts bricks.file.to_json
+  end
+end
+
