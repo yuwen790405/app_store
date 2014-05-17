@@ -14,6 +14,8 @@ module GoodData::Bricks
       client = @params["salesforce_client"]
       bulk_client = @params["salesforce_bulk_client"]
       objects = @params["salesforce_objects"]
+      created_from = @params["salesforce_created_from"]
+      created_to = @params["salesforce_created_to"]
 
       # save the information about download - sfdc server
       instance = bulk_client.instance_url
@@ -71,38 +73,36 @@ module GoodData::Bricks
     private
 
     def download_main_dataset(client, bulk_client, obj, fields)
+      created_from = @params["salesforce_created_from"]
+      created_to = @params["salesforce_created_to"]
+      single_batch = @params["salesforce_single_batch"]
+
       q = construct_query(obj, fields)
       logger = @params["GDC_LOGGER"]
       logger.info "Executing soql: #{q}" if logger
 
       begin
+        filename_prefix = @params[:dss_table_prefix] ? @params[:dss_table_prefix] + '_' : nil
+
         # try it with the bulk
-
-        # start the machinery
-        job = bulk_client.start_query(obj, q)
-        filenames = nil
-
-        loop do
-          # check the status
-          status = job.check_job_status
-          # if finished get the result and we're done
-          if status["finished"]
-            # get the results
-            filenames = job.get_job_results({:directory_path => DIRNAME})
-
-            break
-          end
-          sleep(10)
-        end
+        result = bulk_client.query(obj, q,
+          :directory_path => DIRNAME,
+          :filename_prefix => filename_prefix,
+          :created_from => created_from,
+          :created_to => created_to,
+          :single_batch => single_batch
+        )
 
         return {
           :in_files => true,
-          :filenames => filenames
+          :filenames => result[:filenames]
         }
       rescue => e
         require 'pry'; binding.pry
         logger.warn "Batch download failed. Now downloading through REST api instead" if logger
         # if not, try the normal api
+        # recreate the query so that it contains the from and to dates
+        q = construct_query(obj, fields, created_from, created_to)
         data = client.query(q)
         return {
           :in_files => false,
@@ -118,8 +118,21 @@ module GoodData::Bricks
       description.fields.map {|f| {:name => f.name, :type => f.type}}
     end
 
-    def construct_query(obj, fields)
-      "SELECT #{fields.map {|f| f[:name]}.join(', ')} FROM #{obj}"
+    def construct_query(obj, fields, created_from=nil, created_to=nil)
+      base_query = "SELECT #{fields.map {|f| f[:name]}.join(', ')} FROM #{obj}"
+      if created_from && created_to
+        return base_query + " WHERE CreatedDate >= #{created_from} AND CreatedDate < #{created_to}"
+      end
+
+      if created_from
+        return base_query + " WHERE CreatedDate >= #{created_from}"
+      end
+
+      if created_to
+        return base_query + " WHERE CreatedDate < #{created_to}"
+      end
+
+      return base_query
     end
 
   end

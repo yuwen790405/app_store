@@ -273,8 +273,11 @@ module GoodData::Bricks
     private
 
     def sql_table_name(obj)
-      return "dss_#{obj}"
+      pr = @params["dss_table_prefix"]
+      user_prefix = pr ? "#{pr}_" : ""
+      return "dss_#{user_prefix}#{obj}"
     end
+
     def obj_name(sql_table)
       return sql_table[4..-1]
     end

@@ -1,5 +1,6 @@
 require 'gooddata'
 require 'restforce'
+require 'json'
 require '../salesforce_history_downloader/downloader'
 require '../dss_execute/executor'
 include GoodData::Bricks
@@ -15,6 +16,7 @@ module GoodData::Bricks
   class SalesForceDownloaderMiddleware < GoodData::Bricks::Middleware
     def call(params)
       downloaded_info = GoodData::Bricks::SalesForceHistoryDownloader.new(params).run
+      params["GDC_LOGGER"].info "Download finished. This is the info (use in params if you want to upload later: #{JSON.pretty_generate({:salesforce_downloaded_info => downloaded_info})}" if params["GDC_LOGGER"]
       @app.call(params.merge(:salesforce_downloaded_info => downloaded_info))
     end
   end
