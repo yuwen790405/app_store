@@ -1,0 +1,18 @@
+{
+  "salesforce_username": "me@mycompany.com",
+  "salesforce_password": "my password",
+  "salesforce_token": "my token",
+  "dss_table_prefix": "mycompany",
+
+  "salesforce_created_from": "2014-01-25T21:00:11+00:00",
+  "salesforce_created_to": "2014-02-01T16:33:16+00:00",
+
+  "salesforce_single_batch": false,
+
+  "salesforce_client_id": "the sfdc app id",
+  "salesforce_client_secret": "the sfdc app secret",
+  "salesforce_objects": ["Account", "Event", "OpportunityLineItem", "Opportunity", "User", "PricebookEntry", "Product2", "OpportunityStage", "Task"],
+  "dss_jdbc_url": "jdbc:dss://secure.gooddata.com/gdc/dss/instances/something",
+  "dss_GDC_USERNAME": "me@mycompany.com",
+  "dss_GDC_PASSWORD": "my password"
+}
