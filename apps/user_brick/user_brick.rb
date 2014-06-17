@@ -1,6 +1,7 @@
 # utf-8
 require 'open-uri'
-require 'gooddata'
+require_relative '../../../../gooddata/gooddata-ruby/lib/gooddata'
+require 'csv'
 
 module GoodData::Bricks
 
@@ -27,56 +28,40 @@ module GoodData::Bricks
       first_name_column = params[:first_name_column] || default_first_name_column
       last_name_column  = params[:last_name_column] || default_last_name_column
       login_column      = params[:login_column] || default_login_column
-      password_column   = params[:password] || default_password_column
+      password_column   = params[:password_column] || default_password_column
       email_column      = params[:email_column] || default_email_column || default_login_column
       role_column       = params[:role_column] || default_role_column
 
-      # Check mandatory columns and paramters
-      mandatory_params = [domain, project, first_name_column, last_name_column, login_column, password_column]
+      # Check mandatory columns and parameters
+      mandatory_params = [domain, project]
 
       mandatory_params.each do |param|
-        if param == nil
-          fail param+' is required in the block parameters.'
-        end
+        fail param+' is required in the block parameters.' unless param
       end
 
-      header_parsed = false
-
-      new_users = GoodData::Helpers::Csv.read(:path => csv_path, :header => false) do |row|
-
-        if header_parsed == false
-          # TODO: Extract the indices here
-          row.each_with_index do |index, item|
-            first_name_index = index if item == first_name_column
-            last_name_index = index if item == last_name_column
-            login_index = index if item == login_column
-            password_index = index if item == password_column
-            email_index = index if item == email_column
-            role_index = index if item == role_column
-          end
-
-          header_parsed = true
-          next
-        end
-
+      new_users = []
+      CSV.foreach(csv_path, :headers => true, :return_headers => false) do |row|
+      pp row
         json = {
             'user' => {
                 'content' => {
-                    'firstname' => row[first_name_index],
-                    'lastname' => row[last_name_index],
-                    'login' => row[login_index],
-                    'password' => row[password_index],
-                    'email' => row[email_index],
-                    'role' => row[role_index],
+                    'firstname' => row[first_name_column],
+                    'lastname' => row[last_name_column],
+                    'login' => row[login_column],
+                    'password' => row[password_column],
+                    'email' => row[email_column],
+                    'role' => row[role_column],
                     'domain' => domain
                 },
                 'meta' => {}
             }
         }
 
-        GoodData::Membership.new(json)
+        new_users << GoodData::Membership.new(json)
 
       end
+
+      pp new_users
 
       project.users_import(new_users)
 
@@ -86,4 +71,14 @@ module GoodData::Bricks
 
 end
 
-GoodData::Bricks::UserBrick.new().call({ :first_name => 'firstName', :project => '29380f2930', :domain => 'ofsfesesef' })
+
+
+#GoodData.connect('patrick.mcconlogue@gooddata.com','notapassword')
+#
+#params = {
+#    :domain => "ex34am34pl34e34do34ma34in",
+#    :project => "a97oln5yik7lwgjbucw7zbo1ioodkpip",
+#    :csv_path => "./demo.csv"
+#}
+#
+#GoodData::Bricks::UserBrick.new().call(params)
