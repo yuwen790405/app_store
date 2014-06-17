@@ -4,21 +4,23 @@ require 'rspec'
 
 describe GoodData::Bricks::UserBrick do
 
+
   it 'should change the default column from role to privileges' do
 
     GoodData.logging_on
 
-    GoodData.connect('')
+    GoodData.connect('svarovsky+gem_tester@gooddata.com','jindrisska')
 
-    demo_csv = 'email,login,first_name,last_name,privileges,password,\ntomas@gooddata.com,tomas777,tomas,svarovsky,Adminstrator,password123,\npatrick@gooddata.com,patrick1,patrick,mcconlogue,Viewer,notapassword1,\nmark@gooddata.com,mark_hamil,mark,hamil,Viewer,anotherpassword'
+    # REPLACE with GIST
+    #params = {
+    #    :domain => "NO",
+    #    :project => "NO",
+    #    :csv_path => "NO"
+    #}
+    
 
-    params = {
-        :domain => "ex34am34pl34e34do34ma34in",
-        :project => "tlwlkjw9ccmu2wrev9faq9wryybhar0u",
-        :csv_path => demo_csv
-    }
+    GoodData::Bricks::UserBrick.new().call(params)
 
-    brick = GoodData::Bricks::UserBrick.new().call(params)
 
     #p = GoodData::Bricks::Pipeline.prepare([brick])
 
