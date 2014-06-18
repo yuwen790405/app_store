@@ -36,6 +36,6 @@
       "description" : "A column containing role of the user in the project. Keep in mind this is not a filter.",
       "type"        : "string",
       "mandatory"   : true
-    },
+    }
   ]
 }

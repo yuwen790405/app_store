@@ -4,5 +4,5 @@
   "login_column" : "login",
   "email_column" : "email",
   "role_column" : "role",
-  "domain" : "The Project's Domain",
+  "domain" : "The Project's Domain"
 }
