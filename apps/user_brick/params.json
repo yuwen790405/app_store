@@ -1,8 +1,5 @@
 {
-  "first_name_column" : "first_name",
-  "last_name_column" : "last_name",
-  "login_column" : "login",
-  "email_column" : "email",
-  "role_column" : "role",
-  "domain" : "The Project's Domain",
+  "domain" : "gooddata-tomas-svarovsky",
+  "csv_path" : "demo.csv",
+  "add_only_to_domain" : "false"
 }
