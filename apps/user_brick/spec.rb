@@ -16,6 +16,14 @@ describe GoodData::Bricks::UserBrick do
     #GoodData.connection.cookies[:cookies]['GDCAuthSST']
 
     project = GoodData::Project['tzk6o6t45ku3u875ttbebv1avjxppu75']
+    GoodData.connect('svarovsky+gem_tester@gooddata.com', 'jindrisska')
+
+
+    params = {
+        :domain => "gooddata-tomas-svarovsky",
+        :project => "pua4g8eplv06iayn5nkz0brqnb5l7i70",
+        :csv_path => "./demo.csv"
+    }
 
     # Add a demo user - ++ TODO: Add the clean up :before/:after
 
@@ -56,5 +64,3 @@ describe GoodData::Bricks::UserBrick do
 
 
 end
-
-# GoodData::Bricks::UserBrick.new().call({ :first_name => 'firstName', :project => '29380f2930', :domain => 'ofsfesesef' })
