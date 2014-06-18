@@ -7,6 +7,6 @@ p = GoodData::Bricks::Pipeline.prepare([
   LoggerMiddleware,
   BenchMiddleware,
   GoodDataMiddleware,
-  CreateProjectBrick])
+  UserBrick])
 
 p.call($SCRIPT_PARAMS)
