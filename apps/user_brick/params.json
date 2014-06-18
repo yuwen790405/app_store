@@ -1,0 +1,8 @@
+{
+  "first_name_column" : "first_name",
+  "last_name_column" : "last_name",
+  "login_column" : "login",
+  "email_column" : "email",
+  "role_column" : "role",
+  "domain" : "The Project's Domain",
+}
