@@ -57,6 +57,7 @@ end
 
 desc 'Writes JSON file to location.'
 task :write, :file do |w, bricks|
+
   File.open("./build/bricks.json", 'w') do |f|
     f.puts bricks.file.to_json
   end

@@ -1,6 +1,7 @@
 # utf-8
 require 'open-uri'
 require 'csv'
+require 'gooddata'
 
 module GoodData::Bricks
 
