@@ -1,5 +1,5 @@
 require 'gooddata'
-require './fixed_level_hierarchy_brick'
+require './salesforce_security_brick'
 
 include GoodData::Bricks
 
