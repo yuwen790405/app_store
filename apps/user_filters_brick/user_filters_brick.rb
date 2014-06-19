@@ -15,8 +15,10 @@ module GoodData::Bricks
 
       filters_filepath = params['filters_filepath']
       config = params['filters_setup']
-
-      filters = GoodData::UserFilterBuilder::get_filters(filters_filepath, config);
+      symbolized_config = config.deep_dup
+      symbolized_config.symnbolize_keys!
+      symbolized_config[:labels].each {|l| l.symnbolize_keys!}
+      filters = GoodData::UserFilterBuilder::get_filters(filters_filepath, symbolized_config);
       GoodData::UserFilterBuilder.execute_mufs(filters_to_load, :domain => domain)
     end
   end
