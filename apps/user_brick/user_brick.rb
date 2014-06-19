@@ -16,6 +16,8 @@ module GoodData::Bricks
       project = params['gdc_project']
       csv_path = params['csv_path']
       only_domain = params['add_only_to_domain'] == 'true' || params['add_only_to_domain'] == true ? true : false
+      whitelists = params['whitelists']
+
       # Check mandatory columns and parameters
       mandatory_params = [domain_name, csv_path]
 
@@ -55,7 +57,7 @@ module GoodData::Bricks
       if only_domain
         domain.users_create(new_users)
       else
-        project.users_import(new_users, domain)
+        project.users_import(new_users, domain: domain, :whitelists => whitelists)
       end
     end
   end
