@@ -1,18 +1,7 @@
-require 'bundler/setup'
-require 'gooddata'
-require 'user_hierarchies'
-require 'csv'
-require 'benchmark'
-require 'pry'
+# encoding: utf-8
 
-# {
-#   user:
-#   role:
-#   group:
-#   group_member:
-#   shares:
-#   output_file:
-# }
+require 'gooddata'
+require './user_hierarchies/lib/user_hierarchies'
 
 # Share id has to be named ObjectId
 # Role Id has to be named RoleId
@@ -36,14 +25,14 @@ module GoodData::Bricks
       output_filenames = params['results_filenames']
       permission_object_types = params['permission_object_types']
 
-      csv_params = { headers: true, return_headers: false }
-      users = CSV.parse(File.read(users_filename), csv_params)
-      roles = CSV.parse(File.read(user_roles_filename), csv_params)
+      csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
+      users = CSV.parse(File.open(users_filename, 'r:UTF-8').read, csv_params)
+      roles = CSV.parse(File.open(user_roles_filename, 'r:UTF-8').read, csv_params)
 
-      groups = CSV.parse(File.read(groups_filename), csv_params)
-      group_members = CSV.parse(File.read(group_members_filename), csv_params)
-      permission = CSV.parse(File.read(permissions_filename), csv_params)
-      permission_set = CSV.parse(File.read(permission_sets_filename), csv_params)
+      groups = CSV.parse(File.open(groups_filename, 'r:UTF-8').read, csv_params)
+      group_members = CSV.parse(File.open(group_members_filename, 'r:UTF-8').read, csv_params)
+      permission = CSV.parse(File.open(permissions_filename, 'r:UTF-8').read, csv_params)
+      permission_set = CSV.parse(File.open(permission_sets_filename, 'r:UTF-8').read, csv_params)
 
       $group_lookup = GoodData::Helpers.create_lookup(groups, 'Id')
       $group_members_lookup = GoodData::Helpers.create_lookup(group_members, 'GroupId')
@@ -76,15 +65,15 @@ module GoodData::Bricks
   # -----------------------
       share_id_fields = params['share_id_fields']
       shares_filenames.zip(objects_filenames, output_filenames, share_id_fields, permission_object_types).each do |x, y, z, w, v|
-        resolve_shares(x, y, z, w, v, params.merge(super_users: super_users))
+        resolve_shares(x, y, z, w, v, params, {super_users: super_users})
       end
     end
 
-    def resolve_shares(shares_filename, objects_filename, output_filename, share_id_field, permission_object_type, params)
+    def resolve_shares(shares_filename, objects_filename, output_filename, share_id_field, permission_object_type, params, inner_params)
   
-      super_users = params[:super_users]
-      csv_params = { headers: true, return_headers: false }
-      shares = CSV.parse(File.read(shares_filename), csv_params)
+      super_users = inner_params[:super_users]
+      csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
+      shares = CSV.parse(File.open(shares_filename, 'r:UTF-8').read, csv_params)
 
       $resolve_group_cache = {}
       visibility = {}
@@ -92,6 +81,7 @@ module GoodData::Bricks
       shares.each do |share|
         share = share.to_hash
         stuff = resolve_share_or_group_member(share)
+        
         stuff.select {|x| x.IsActive == 'true'}.each do |x|
           visibility[[x.Id, share[share_id_field]]] = 1
         end
@@ -99,7 +89,7 @@ module GoodData::Bricks
 
       # Resolve super users
       filtered_super_users = super_users.select { |x| x['SobjectType'] == permission_object_type }
-      CSV.foreach(objects_filename, csv_params) do |row|
+      CSV.foreach(File.open(objects_filename, 'r:UTF-8'), csv_params) do |row|
         filtered_super_users.each do |u|
           visibility[[u['Id'], row['Id']]] = 1
         end
@@ -112,6 +102,11 @@ module GoodData::Bricks
           csv << k
         end
       end
+      (params["gdc_files_to_upload"] ||= []) << {:path => output_filename}
+    end
+
+    def user?(user_hieararchy, id)
+      !!user_hieararchy.find_by_id(id)
     end
 
     def resolve_group(group)
@@ -130,10 +125,6 @@ module GoodData::Bricks
       x = group['DoesIncludeBosses'] == 'true' ? users_to_resolve.mapcat { |u| u.all_managers_with_self } : users_to_resolve
       $resolve_group_cache[group] = x
       x
-    end
-
-    def user?(user_hieararchy, id)
-      !!user_hieararchy.find_by_id(id)
     end
 
     def resolve_share_or_group_member(obj)

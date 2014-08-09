@@ -18,8 +18,9 @@ module GoodData::Bricks
       symbolized_config = config.deep_dup
       symbolized_config.symbolize_keys!
       symbolized_config[:labels].each {|l| l.symbolize_keys!}
+
       filters_to_load = GoodData::UserFilterBuilder::get_filters(filters_filepath, symbolized_config);
-      GoodData::UserFilterBuilder.execute_mufs(filters_to_load, :domain => domain)
+      GoodData::UserFilterBuilder.execute_mufs(filters_to_load, :domain => domain, :dry_run => false)
     end
   end
 end
