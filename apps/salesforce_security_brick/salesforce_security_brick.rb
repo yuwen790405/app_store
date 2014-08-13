@@ -20,10 +20,7 @@ module GoodData::Bricks
       permissions_filename = params['permissions_filename'] || 'ObjectPermissions.csv'
       permission_sets_filename = params['permission_sets_filename'] || 'PermissionSet.csv'
 
-      shares_filenames = params['shares_filenames']
-      objects_filenames = params['objects_filenames']
-      output_filenames = params['results_filenames']
-      permission_object_types = params['permission_object_types']
+      to_process = params['to_process']
 
       csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
       users = CSV.parse(File.open(users_filename, 'r:UTF-8').read, csv_params)
@@ -63,14 +60,12 @@ module GoodData::Bricks
       end
 
   # -----------------------
-      share_id_fields = params['share_id_fields']
-      shares_filenames.zip(objects_filenames, output_filenames, share_id_fields, permission_object_types).each do |x, y, z, w, v|
-        resolve_shares(x, y, z, w, v, params, {super_users: super_users})
+      to_process.each do |vals|
+        resolve_shares(vals['shares_filename'], vals['objects_filename'], vals['output_filename'], vals['share_id_field'], vals['permission_object_type'], params, {super_users: super_users})
       end
     end
 
     def resolve_shares(shares_filename, objects_filename, output_filename, share_id_field, permission_object_type, params, inner_params)
-  
       super_users = inner_params[:super_users]
       csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
       shares = CSV.parse(File.open(shares_filename, 'r:UTF-8').read, csv_params)
