@@ -9,4 +9,3 @@ gem "activesupport"
 gem "timecop"
 gem "restforce"
 gem "pry"
-gem 'user_hierarchies'
