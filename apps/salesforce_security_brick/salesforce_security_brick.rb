@@ -58,7 +58,6 @@ module GoodData::Bricks
         $role_lookup[key] = [] unless $role_lookup.key?(key)
         $role_lookup[key] << x
       end
-
   # -----------------------
       to_process.each do |vals|
         resolve_shares(vals['shares_filename'], vals['objects_filename'], vals['output_filename'], vals['share_id_field'], vals['permission_object_type'], params, {super_users: super_users})
@@ -68,36 +67,48 @@ module GoodData::Bricks
     def resolve_shares(shares_filename, objects_filename, output_filename, share_id_field, permission_object_type, params, inner_params)
       super_users = inner_params[:super_users]
       csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
-      shares = CSV.parse(File.open(shares_filename, 'r:UTF-8').read, csv_params)
-
       $resolve_group_cache = {}
       visibility = {}
-      # Resolve the share rules
-      shares.each do |share|
-        share = share.to_hash
-        stuff = resolve_share_or_group_member(share)
-        
-        stuff.select {|x| x.IsActive == 'true'}.each do |x|
-          visibility[[x.Id, share[share_id_field]]] = 1
-        end
-      end
+      count = 0
 
-      # Resolve super users
-      filtered_super_users = super_users.select { |x| x['SobjectType'] == permission_object_type }
-      CSV.foreach(File.open(objects_filename, 'r:UTF-8'), csv_params) do |row|
-        filtered_super_users.each do |u|
-          visibility[[u['Id'], row['Id']]] = 1
-        end
-      end
-
-      # Serialize to CSV
       CSV.open(output_filename, 'w') do |csv|
         csv << ['user_id', 'object_id']
-        visibility.each do |k, v|
-          csv << k
+
+        # Resolve the share rules
+        CSV.foreach(File.open(shares_filename, 'r:UTF-8'), csv_params) do |share|
+        # shares.map do |share|
+          count += 1
+          puts count if count % 10000 == 0
+          share = share.to_hash
+          stuff = resolve_share_or_group_member(share)
+          # if count % 1000 == 0
+        
+          stuff.select {|x| x.IsActive == 'true'}.each do |x|
+            unless visibility.key?([x.Id, share[share_id_field]])
+              csv << [x.Id, share[share_id_field]]
+              visibility[[x.Id, share[share_id_field]]] = 1
+            end
+          end
+          nil
         end
+
+        # Resolve super users
+        count = 0
+        filtered_super_users = super_users.select { |x| x['SobjectType'] == permission_object_type }
+        puts "Resolving Super users"
+        CSV.foreach(File.open(objects_filename, 'r:UTF-8'), csv_params) do |row|
+          count += 1
+          puts count if count % 1000 == 0
+          filtered_super_users.each do |u|
+            unless visibility.key?([u['Id'], row['Id']])
+              csv << [u['Id'], row['Id']]
+              visibility[[u['Id'], row['Id']]] = 1
+            end
+          end
+        end
+
       end
-      (params["gdc_files_to_upload"] ||= []) << {:path => output_filename}
+      # (params["gdc_files_to_upload"] ||= []) << {:path => output_filename}
     end
 
     def user?(user_hieararchy, id)
@@ -115,11 +126,15 @@ module GoodData::Bricks
           $role_lookup[group['RelatedId']].select {|u| ['None', 'Standard'].include?(u.PortalType)}.map {|u| $user_hieararchy.find_by_id(u[:Id])}.mapcat {|u| u.all_subordinates_with_self }.select {|u| ['None', 'Standard'].include?(u.PortalType) }
         else
           members = $group_members_lookup[group['Id']] || []
-          members.mapcat {|member| resolve_share_or_group_member(member)}
+          # puts "Mapcating"
+          res = members.mapcat {|member| resolve_share_or_group_member(member)}
+          # puts "done"
+          res
         end
       x = group['DoesIncludeBosses'] == 'true' ? users_to_resolve.mapcat { |u| u.all_managers_with_self } : users_to_resolve
-      $resolve_group_cache[group] = x
-      x
+      y = x.uniq
+      $resolve_group_cache[group] = y
+      y
     end
 
     def resolve_share_or_group_member(obj)
@@ -129,8 +144,12 @@ module GoodData::Bricks
         [$user_hieararchy.find_by_id(id)].mapcat {|u| u.all_managers_with_self }
       else
         group = $group_lookup[id].first.to_hash
+        # puts "*****"
         result = $resolve_group_cache[group] || resolve_group(group)
       end
+    rescue
+      # puts "GROUP WITH ID #{id} does not exist"
+      []
     end
   end
 end
