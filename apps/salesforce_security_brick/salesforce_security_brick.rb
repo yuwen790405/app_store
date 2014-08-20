@@ -82,11 +82,11 @@ module GoodData::Bricks
           share = share.to_hash
           stuff = resolve_share_or_group_member(share)
           # if count % 1000 == 0
-        
+
           stuff.select {|x| x.IsActive == 'true'}.each do |x|
-            unless visibility.key?([x.Id, share[share_id_field]])
+            unless visibility.key?([x.Id, share[share_id_field]].join)
               csv << [x.Id, share[share_id_field]]
-              visibility[[x.Id, share[share_id_field]]] = 1
+              visibility[[x.Id, share[share_id_field]].join] = 1
             end
           end
           nil
@@ -100,15 +100,14 @@ module GoodData::Bricks
           count += 1
           puts count if count % 1000 == 0
           filtered_super_users.each do |u|
-            unless visibility.key?([u['Id'], row['Id']])
+            unless visibility.key?([u['Id'], row['Id']].join)
               csv << [u['Id'], row['Id']]
-              visibility[[u['Id'], row['Id']]] = 1
+              visibility[[u['Id'], row['Id']].join] = 1
             end
           end
         end
-
       end
-      # (params["gdc_files_to_upload"] ||= []) << {:path => output_filename}
+      (params["gdc_files_to_upload"] ||= []) << {:path => output_filename}
     end
 
     def user?(user_hieararchy, id)
