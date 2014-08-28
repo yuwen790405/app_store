@@ -41,6 +41,7 @@ module GoodData::Bricks
       filtered_permission_user = merged_permissions_users.select { |x| x['PermissionsViewAllRecords'] == 'true' }
       super_users = filtered_permission_user.select {|u| u['IsActive'] == 'true'}
 
+      
       $user_hieararchy = GoodData::UserHierarchies::UserHierarchy.build_hierarchy(merged_users, {
         :hashing_id => :Id,
         :id => :RoleId,
@@ -80,7 +81,7 @@ module GoodData::Bricks
           count += 1
           puts count if count % 10000 == 0
           share = share.to_hash
-          stuff = resolve_share_or_group_member(share)
+          stuff = resolve_share_or_group_member(share,nil)
           # if count % 1000 == 0
 
           stuff.select {|x| x.IsActive == 'true'}.each do |x|
@@ -114,10 +115,11 @@ module GoodData::Bricks
       !!user_hieararchy.find_by_id(id)
     end
 
-    def resolve_group(group)
+    def resolve_group(group, includeBosses = nil)
+      includeBosses = group['DoesIncludeBosses'] if includeBosses.nil?
       users_to_resolve = case group['Type']
         when 'Role'
-          ($role_lookup[group['RelatedId']] || [])
+          ($role_lookup[group['RelatedId']] || []) # WHAT IF role doesnt include any users but there are users in manager role and group should include bosses?
         when 'RoleAndSubordinates'
           ($role_lookup[group['RelatedId']] || []).mapcat {|u| u.all_subordinates_with_self}
         # !! ADD Internal
@@ -126,25 +128,29 @@ module GoodData::Bricks
         else
           members = $group_members_lookup[group['Id']] || []
           # puts "Mapcating"
-          res = members.mapcat {|member| resolve_share_or_group_member(member)}
+          res = members.mapcat {|member| resolve_share_or_group_member(member,includeBosses)}
           # puts "done"
           res
         end
-      x = group['DoesIncludeBosses'] == 'true' ? users_to_resolve.mapcat { |u| u.all_managers_with_self } : users_to_resolve
+      x = includeBosses == 'true' ? users_to_resolve.mapcat { |u| u.all_managers_with_self } : users_to_resolve
       y = x.uniq
-      $resolve_group_cache[group] = y
+      $resolve_group_cache[[group, includeBosses]] = y 
       y
     end
 
-    def resolve_share_or_group_member(obj)
+    def resolve_share_or_group_member(obj,includeBosses)
       id = obj['UserOrGroupId']
       is_user = user?($user_hieararchy, id)
       if is_user
-        [$user_hieararchy.find_by_id(id)].mapcat {|u| u.all_managers_with_self }
+        if includeBosses.nil? or includeBosses == 'true'
+          [$user_hieararchy.find_by_id(id)].mapcat {|u| u.all_managers_with_self } 
+        else 
+          [$user_hieararchy.find_by_id(id)]
+        end
       else
         group = $group_lookup[id].first.to_hash
-        # puts "*****"
-        result = $resolve_group_cache[group] || resolve_group(group)
+        ib = includeBosses.nil? ? 'false' : 'true'
+        result = $resolve_group_cache[[group, ib]] || resolve_group(group, includeBosses)
       end
     rescue
       # puts "GROUP WITH ID #{id} does not exist"
@@ -152,3 +158,6 @@ module GoodData::Bricks
     end
   end
 end
+
+
+
