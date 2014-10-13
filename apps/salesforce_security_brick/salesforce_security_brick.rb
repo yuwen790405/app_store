@@ -2,6 +2,9 @@
 
 require 'gooddata'
 require './user_hierarchies/lib/user_hierarchies'
+require 'tempfile'
+require 'gdbm'
+
 
 # Share id has to be named ObjectId
 # Role Id has to be named RoleId
@@ -69,7 +72,7 @@ module GoodData::Bricks
       super_users = inner_params[:super_users]
       csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
       $resolve_group_cache = {}
-      visibility = {}
+      visibility = GDBM.new(Tempfile.new('gdbm-visibility.db').path)
       count = 0
 
       CSV.open(output_filename, 'w') do |csv|
@@ -87,7 +90,7 @@ module GoodData::Bricks
           stuff.select {|x| x.IsActive == 'true'}.each do |x|
             unless visibility.key?([x.Id, share[share_id_field]].join)
               csv << [x.Id, share[share_id_field]]
-              visibility[[x.Id, share[share_id_field]].join] = 1
+              visibility[[x.Id, share[share_id_field]].join] = "1"
             end
           end
           nil
@@ -103,7 +106,7 @@ module GoodData::Bricks
           filtered_super_users.each do |u|
             unless visibility.key?([u['Id'], row['Id']].join)
               csv << [u['Id'], row['Id']]
-              visibility[[u['Id'], row['Id']].join] = 1
+              visibility[[u['Id'], row['Id']].join] = "1"
             end
           end
         end
