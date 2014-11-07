@@ -12,7 +12,7 @@ p = GoodData::Bricks::Pipeline.prepare([
   GoodDataMiddleware,
   FsProjectDownloadMiddleware.new(:source => :staging),
   FsProjectUploadMiddleware.new(:destination => :staging),
-  SalesforceSecurityBrick
+  SalesforceSecurityBrick.new(:zip_result => true, :inmemory_records_nr => 6000000)
 ])
 
 params = $SCRIPT_PARAMS.to_hash

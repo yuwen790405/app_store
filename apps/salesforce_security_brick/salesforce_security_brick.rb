@@ -2,9 +2,8 @@
 
 require 'gooddata'
 require './user_hierarchies/lib/user_hierarchies'
-require 'tempfile'
-require 'gdbm'
-
+require './overflow_hash'
+require 'zip'
 
 # Share id has to be named ObjectId
 # Role Id has to be named RoleId
@@ -13,6 +12,18 @@ module GoodData::Bricks
   class SalesforceSecurityBrick < GoodData::Bricks::Brick
     def version
       "0.0.1"
+    end
+    
+    def initialize(options = {})
+       super()
+       
+       # Should be the result csv zipped? (each file in separate zip)
+       @zip_result = options[:zip_result] || true
+       
+       # How many records of the visibility hash should be stored in memory?
+       # Implementation uses overflow hash - the rest of the records is stored on disk (GDBM database)
+       # 6000000 should work for the platform setup (3GB of memory)
+       @inmemory_records_nr = options[:inmemory_records_nr] || 6000000
     end
 
     def call(params)
@@ -72,7 +83,7 @@ module GoodData::Bricks
       super_users = inner_params[:super_users]
       csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
       $resolve_group_cache = {}
-      visibility = GDBM.new(Tempfile.new('gdbm-visibility.db').path)
+      visibility = OverflowHash.new(@inmemory_records_nr)      
       count = 0
 
       CSV.open(output_filename, 'w') do |csv|
@@ -111,7 +122,23 @@ module GoodData::Bricks
           end
         end
       end
-      (params["gdc_files_to_upload"] ||= []) << {:path => output_filename}
+      
+      file_to_upload = output_filename
+      if(@zip_result)
+          file_to_upload = zip_file(File.open(output_filename, 'r'))	  
+       end 
+      (params["gdc_files_to_upload"] ||= []) << {:path => file_to_upload}
+    end
+
+    def zip_file(file)
+      file_basename = File.basename(file)
+      zip_filename = file_basename + '.zip'
+      File.open(zip_filename, 'w') do |zip|
+        Zip::File.open(zip.path, Zip::File::CREATE) do |zipfile|
+          zipfile.add(file_basename, file.path)
+        end
+      end
+      zip_filename
     end
 
     def user?(user_hieararchy, id)
