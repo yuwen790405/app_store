@@ -82,9 +82,11 @@ module GoodData::Bricks
     def resolve_shares(shares_filename, objects_filename, output_filename, share_id_field, permission_object_type, params, inner_params)
       super_users = inner_params[:super_users]
       csv_params = { headers: true, return_headers: false, encoding: "ISO-8859-1" }
+      deduplicate = params['deduplicate'] == false || params['deduplicate'] == 'false' || true
       $resolve_group_cache = {}
       visibility = OverflowHash.new(@inmemory_records_nr)      
       count = 0
+      puts "Processing #{shares_filename}"
 
       CSV.open(output_filename, 'w') do |csv|
         csv << ['user_id', 'object_id']
@@ -99,9 +101,13 @@ module GoodData::Bricks
           # if count % 1000 == 0
 
           stuff.select {|x| x.IsActive == 'true'}.each do |x|
-            unless visibility.key?([x.Id, share[share_id_field]].join)
+            if deduplicate
+              unless visibility.key?([x.Id, share[share_id_field]].join)
+                csv << [x.Id, share[share_id_field]]
+                visibility[[x.Id, share[share_id_field]].join] = "1"
+              end
+            else
               csv << [x.Id, share[share_id_field]]
-              visibility[[x.Id, share[share_id_field]].join] = "1"
             end
           end
           nil
@@ -115,9 +121,13 @@ module GoodData::Bricks
           count += 1
           puts count if count % 1000 == 0
           filtered_super_users.each do |u|
-            unless visibility.key?([u['Id'], row['Id']].join)
+            if deduplicate
+              unless visibility.key?([u['Id'], row['Id']].join)
+                csv << [u['Id'], row['Id']]
+                visibility[[u['Id'], row['Id']].join] = "1"
+              end
+            else
               csv << [u['Id'], row['Id']]
-              visibility[[u['Id'], row['Id']].join] = "1"
             end
           end
         end
@@ -188,6 +198,3 @@ module GoodData::Bricks
     end
   end
 end
-
-
-
