@@ -3,6 +3,7 @@
 require 'gooddata'
 require './salesforce_security_brick'
 require './middleware'
+require 'net/dav'
 
 include GoodData::Bricks
 
