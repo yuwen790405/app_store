@@ -1,5 +1,5 @@
 {
-  "name"       : "salesforce_sucurity_brick",
+  "name"       : "salesforce_security_brick",
   "version"    : "0.0.1",
   "category"   : "prebuilt-etl",
   "language"   : "ruby",
