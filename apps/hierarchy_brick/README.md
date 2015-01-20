@@ -4,7 +4,7 @@ This brick provides several implementations of the most widely used variations o
 ## Types of input
 Brick accepts data in adjacency tree. This means that representing this structure
 
-![Example hierarchy](https://dl.dropboxusercontent.com/content_link/gQUfoAzoG9GOVhMN6zXaMThQ8To7y1AVHnK0gsRatytFOQa8jB6QOyCxIHDLOdhC)
+![Example hierarchy](https://www.dropbox.com/s/j25qw0ef2ra6q20/hierarchy_brick_hierarchy_example.png?dl=0&raw=1)
 
 Id|Parent
 --|------
