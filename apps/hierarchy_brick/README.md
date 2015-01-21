@@ -5,12 +5,13 @@ This brick provides several implementations of the most widely used variations o
 Brick accepts data in adjacency tree. This means that representing this structure
 
 ![Example hierarchy](https://www.dropbox.com/s/j25qw0ef2ra6q20/hierarchy_brick_hierarchy_example.png?dl=0&raw=1)
-Id |Parent
----|------
- A | B     
- B | A
- C | A
- D | E
+
+ Id | Parent
+----|-------
+ A  | B     
+ B  | A
+ C  | A
+ D  | E
  
 ##Types of output
 
