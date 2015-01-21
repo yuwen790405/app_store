@@ -6,7 +6,7 @@ Brick accepts data in adjacency tree. This means that representing this structur
 
 ![Example hierarchy](https://www.dropbox.com/s/j25qw0ef2ra6q20/hierarchy_brick_hierarchy_example.png?dl=0&raw=1)
 
- Id | Parent
+ id | parent
 ----|-------
  A  | B     
  B  | A
@@ -21,20 +21,21 @@ The adjacency tree input is very information rich unfortunately it is not so use
 The first type expands the hierarchy to contain all the relationships not just child -> parent as in adjacency table. For our example the output would look like this.
 
 #### Output
-parent_id|subordinate_id
----------|--------------
-A        |A
-A        |B
-A        |C
-A        |D
-A        |E
-B        |B
-B        |D
-B        |E
-D        |D
-E        |E
-C        |C
 
+ parent_id | subordinate_id
+-----------|---------------
+  A        |  A
+  A        |  B
+  A        |  C
+  A        |  D
+  A        |  E
+  B        |  B
+  B        |  D
+  B        |  E
+  D        |  D
+  E        |  E
+  C        |  C
+  
 This is much more nicer to work with visually. Try to find if E is a subordinate of C in the first one vs this one. Also it is nicer to work with in nonrecursive languages. It is directly useful for uploading to GoodData for usage in Data filters etc.
 
 #### Additional fields
@@ -52,14 +53,14 @@ There are couple of preconditions that has to be valid in this case
 #### Output
 Our example fulfills both of the precondition and the output would look like this.
 
-level_1|level_2|level_3|level
--------|-------|-------------
-A      |A      |A      |1
-A      |B      |B      |2
-A      |B      |D      |3
-A      |B      |E      |3
-A      |C      |C      |2
-
+ level_1 | level_2 | level_3 | level
+---------|---------|---------|-------
+  A      |  A      |  A      |  1
+  A      |  B      |  B      |  2
+  A      |  B      |  D      |  3
+  A      |  B      |  E      |  3
+  A      |  C      |  C      |  2
+  
 #### Additional fields
 You can provide names of additional fields that will be propagated from the source hierarchy.
 
