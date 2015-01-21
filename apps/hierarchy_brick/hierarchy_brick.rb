@@ -3,7 +3,8 @@
 require 'open-uri'
 require 'csv'
 require 'gooddata'
-require './user_hierarchies/lib/user_hierarchies'
+require_relative 'vendor/user_hierarchies/lib/user_hierarchies'
+require_relative 'vendor/middleware'
 
 module GoodData::Bricks
   class HierarchyBrick < GoodData::Bricks::Brick
@@ -11,32 +12,43 @@ module GoodData::Bricks
       "0.0.1"
     end
 
+    def write_csv(x, &block)
+      if x.is_a?(String)
+        File.open(x, 'w', &block)
+      elsif x.is_a?(StringIO)
+        block.call(x)
+      end
+      x
+    end 
+
     def call(params)
-      hierarchy_filepath = params['hierarchy_filepath']
+      input_file = params['input_file']
+      output_file = params['output_file']
+
       config = params['config']
       output_fields = params['output_fields'] || []
       hierarchy_type = params['hierarchy_type']
       symbolized_config = config.symbolize_keys
-      user_hierarchy = GoodData::UserHierarchies::UserHierarchy.read_from_csv(hierarchy_filepath, symbolized_config)
-      binding.pry
-      results = case hierarchy_type
-      when 'fixed_level'
+      user_hierarchy = GoodData::UserHierarchies::UserHierarchy.read_from_csv(input_file, symbolized_config)
+      results = case hierarchy_type.to_sym
+      when :fixed_level
         fixed_level_hierarchy(user_hierarchy, output_fields)
-      when 'subordinates_closure'
+      when :subordinates_closure
         subordinates_closure(user_hierarchy, output_fields)
-      when 'subordinates_closure_tuples'
+      when :subordinates_closure_tuples
         subordinates_closure_tuples(user_hierarchy, output_fields)
       end
-      file = 'hierarchy_out.csv'
-      CSV.open(file, 'w') do |csv|
-        results.each { |r| csv << r }
+
+      write_csv(output_file) do |csv|
+        results.each { |r| csv << CSV.generate_line(r) }
       end
-      (params['gdc_files_to_upload'] ||= []) << {:path => file}
+
+      (params['gdc_files_to_upload'] ||= []) << {:path => output_file}
     end
 
-    def subordinates_closure(user_hierarchy, output_fields)
+    def subordinates_closure(user_hierarchy, output_fields, options = {})
       user_hierarchy.users.map do |u|
-        output_fields.map { |f| u.send(f) } + u.all_subordinates_with_self.map {|x| x[user_hierarchy.hashing_id]}
+        [u.send(user_hierarchy.hashing_id)] + output_fields.map { |f| u.send(f) } + u.all_subordinates_with_self.map {|x| x[user_hierarchy.hashing_id]}
       end
     end
 
