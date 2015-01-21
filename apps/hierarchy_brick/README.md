@@ -8,10 +8,10 @@ Brick accepts data in adjacency tree. This means that representing this structur
 
 Id|Parent
 --|------
-A |B     
-B |A
-C |A
-D |E
+A | B     
+B | A
+C | A
+D | E
  
 ##Types of output
 
