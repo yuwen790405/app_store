@@ -13,8 +13,6 @@ p = GoodData::Bricks::Pipeline.prepare([
   GoodDataMiddleware,
   FsProjectDownloadMiddleware.new(:source => :staging),
   FsProjectUploadMiddleware.new(:destination => :staging),
-  UserBrick])
+  UsersBrick])
 
-params = $SCRIPT_PARAMS.to_hash
-expanded_params = params.merge(MultiJson.load(params["params"]))
-p.call(expanded_params)
+p.call($SCRIPT_PARAMS.to_hash)

@@ -5,7 +5,7 @@ require 'gooddata'
 
 module GoodData::Bricks
 
-  class UserBrick < GoodData::Bricks::Brick
+  class UsersBrick < GoodData::Bricks::Brick
     def version
       "0.0.1"
     end
