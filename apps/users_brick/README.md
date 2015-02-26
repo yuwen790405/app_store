@@ -16,8 +16,6 @@ This brick in particular was built to allow you to deploy once and never have to
 
 ## What you need to get started:
 - The domain of the project
-- A CSV file containing the user names, first and last name, password, role, and optionally email
-
 
 ## Example data
 To better illustrate what is going to happen we will use these test data
@@ -41,13 +39,16 @@ The way domain updates work is that all the users that you provided in the input
 * login has to have a format of an email address
 * if specific email address is not provided login is used instead
 
-### How to run
+### Parameters
 
 There are only couple of things you have to configure. For the rest sensible defaults are provided and you an override them if you need to. What you have to specify is the following
 
+
+#### Required parameters
 * file with the input data
 * name of domain
 
+#### Defaults
 The following list contains the properties that are useful to specify for updating a domain. The name after hyphen is the default. In parenthesis you can find name of the parameter you can use to override the default.
 
 * First name - first_name (first_name_column)
@@ -65,12 +66,6 @@ For instance, if in your data first names would be stored in a column called "us
 
 
 As mentioned previously only login is really required all other columns will be provided with defaults if not specified.
-
-## Runtime Notes
-- If no email is provided, the login is used in used in it's place.
-- Roles are resolved by their identifier ("adminRole"), you can view the complete list [User Roles](https://support.gooddata.com/entries/23297728-User-Roles-Overview)
-- Users not found in the CSV will be removed.
-
 
 
 

@@ -4,7 +4,7 @@ describe GoodData::Schedule do
 
   before(:all) do
     GoodData.logging_on
-    @client = GoodData.connect
+    @client = GoodData.connect('svarovsky+gem_tester@gooddata.com', '')
     @project = @client.create_project(title: 'Project for schedule testing', auth_token: '')
   end
   

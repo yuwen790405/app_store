@@ -11,12 +11,13 @@ module GoodData::Bricks
     end
 
     def call(params)
-      GoodData.logging_on
+      client = params['GDC_GD_CLIENT'] || fail('client needs to be passed into a brick as "GDC_GD_CLIENT"')
       domain_name = params['domain']
-      project = params['gdc_project'] || GoodData::Project[params['GDC_PROJECT_ID']]
+      project = client.projects(params['gdc_project']) || client.projects(params['GDC_PROJECT_ID'])
       csv_path = params['csv_path']
       only_domain = params['add_only_to_domain'] == 'true' || params['add_only_to_domain'] == true ? true : false
-      whitelists = params['whitelists']
+      whitelists = params['whitelists'] || [client.user.login]
+      multiple_projects_column = params['multiple_projects_column']
 
       # Check mandatory columns and parameters
       mandatory_params = [domain_name, csv_path]
@@ -25,7 +26,7 @@ module GoodData::Bricks
         fail param+' is required in the block parameters.' unless param
       end
 
-      domain = GoodData::Domain[domain_name]
+      domain = client.domain(domain_name)
 
       first_name_column   = params['first_name_column'] || 'first_name'
       last_name_column    = params['last_name_column'] || 'last_name'
@@ -42,28 +43,29 @@ module GoodData::Bricks
       new_users = []
       
       CSV.foreach(File.open(csv_path, 'r:UTF-8'), :headers => true, :return_headers => false, encoding:'utf-8') do |row|
-        
-        json = {
-          'user' => {
-            'content' => {
-              'firstname' => row[first_name_column],
-              'lastname' => row[last_name_column],
-              'login' => row[login_column],
-              'password' => row[password_column],
-              'email' => row[email_column] || row[login_column],
-              'role' => row[role_column],
-              'domain' => domain_name,
-              'sso_provider' => sso_provider || row[sso_provider_column]
-            },
-            'meta' => {}
-          }
+        new_users << {
+          :first_name => row[first_name_column],
+          :last_name => row[last_name_column],
+          :login => row[login_column],
+          :password => row[password_column],
+          :email => row[email_column] || row[login_column],
+          :role => row[role_column],
+          :domain => domain_name,
+          :sso_provider => sso_provider || row[sso_provider_column],
+          :pid => multiple_projects_column.nil? ? nil : row[multiple_projects_column]
         }
-        new_users << GoodData::Membership.new(json)
       end
       if only_domain
-        domain.users_create(new_users, :ignore_failures => ignore_failures)
+        domain.create_users(new_users, :ignore_failures => ignore_failures)
       else
-        project.users_import(new_users, domain: domain, :whitelists => whitelists, :ignore_failures => ignore_failures)
+        if multiple_projects_column
+          new_users.group_by {|u| u[:pid]}.map do |project_id, users|
+            project = client.projects(project_id)
+            project.import_users(users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+          end
+        else
+          project.import_users(new_users , domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+        end
       end
     end
   end
