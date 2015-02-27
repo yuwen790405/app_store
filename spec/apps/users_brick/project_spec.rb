@@ -46,8 +46,7 @@ describe GoodData::Bricks::UsersBrick do
         'GDC_GD_CLIENT' => @client,
         'gdc_project' => @project_1.pid,
         'domain' => @domain.name,
-        'csv_path' => tempfile.path,
-        'whitelists' => ['svarovsky+gem_tester@gooddata.com']
+        'csv_path' => tempfile.path
       )
     ensure
       tempfile.unlink
@@ -72,7 +71,7 @@ describe GoodData::Bricks::UsersBrick do
         'gdc_project'         => @project_1.pid,
         'domain'              => @domain.name,
         'csv_path'            => tempfile.path,
-        'add_only_to_domain'  => true
+        'sync_mode'           => 'add_only_to_domain'
       )
     ensure
       tempfile.unlink
@@ -102,7 +101,7 @@ describe GoodData::Bricks::UsersBrick do
         'domain' => @domain.name,
         'csv_path' => tempfile.path,
         'multiple_projects_column' => 'pid',
-        'whitelists' => ['svarovsky+gem_tester@gooddata.com']
+        'sync_mode' => 'sync_multiple_projects_based_on_pid'
       )
 
       test_data = users_data.group_by { |u| u[:pid] }.map { |pid, u| [pid, u.count] }

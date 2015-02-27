@@ -6,6 +6,8 @@ require 'gooddata'
 module GoodData::Bricks
 
   class UsersBrick < GoodData::Bricks::Brick
+    MODES = %w(add_only_to_domain sync_domain_and_project sync_multiple_projects_based_on_pid sync_one_project_based_on_pid sync_one_project_based_on_custom_id)
+
     def version
       "0.0.1"
     end
@@ -15,7 +17,11 @@ module GoodData::Bricks
       domain_name = params['domain']
       project = client.projects(params['gdc_project']) || client.projects(params['GDC_PROJECT_ID'])
       csv_path = params['csv_path']
-      only_domain = params['add_only_to_domain'] == 'true' || params['add_only_to_domain'] == true ? true : false
+      mode = params['sync_mode']
+      unless mode.nil? || MODES.include?(mode)
+        fail "The parameter \"sync_mode\" has to have one of the values #{MODES.map(&:to_s).join(', ')} or has to be empty."
+      end
+
       whitelists = params['whitelists'] || [client.user.login]
       multiple_projects_column = params['multiple_projects_column']
 
@@ -55,17 +61,44 @@ module GoodData::Bricks
           :pid => multiple_projects_column.nil? ? nil : row[multiple_projects_column]
         }
       end
-      if only_domain
+
+      # There are several scenarios we want to provide with this brick
+      # 1) Sync only domain
+      # 2) Sync both domain and project
+      # 3) Sync multiple projects. Sync them by using one file. The file has to
+      #     contain additional column that contains the PID of the project so the
+      #     process can partition the users correctly. The column is configurable
+      # 4) Sync one project the users are filtered based on a column in the data
+      #     that should contain pid of the project
+      # 5) Sync one project. The users are filtered form a given file based on the
+      #     value in the file. The value is compared against the value
+      #     GOODOT_CUSTOM_PROJECT_ID that is saved in project metadata. This is
+      #     aiming at solving the problem that the customer cannot give us the
+      #     value of a project id in the data since he does not know it upfront
+      #     and we cannot influence its value.
+      case mode
+      when 'add_only_to_domain'
         domain.create_users(new_users, :ignore_failures => ignore_failures)
-      else
-        if multiple_projects_column
-          new_users.group_by {|u| u[:pid]}.map do |project_id, users|
-            project = client.projects(project_id)
-            project.import_users(users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
-          end
-        else
-          project.import_users(new_users , domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+      when 'sync_multiple_projects_based_on_pid'
+        new_users.group_by {|u| u[:pid]}.map do |project_id, users|
+          project = client.projects(project_id)
+          project.import_users(users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
         end
+      when 'sync_one_project_based_on_pid'
+        filtered_users = new_users.select { |u| u[:pid] == project.pid }
+        project.import_users(filtered_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+      when 'sync_one_project_based_on_custom_id'
+        md = project.metadata
+        if md['GOODOT_CUSTOM_PROJECT_ID']
+          filter_value = md['GOODOT_CUSTOM_PROJECT_ID']
+          filtered_users = new_users.select { |u| u[:pid] == filter_value }
+          project.import_users(filtered_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+        else
+          fail "Project \"#{project.pid}\" metadata does not contain key GOODOT_CUSTOM_PROJECT_ID. We are unable to get the value to filter users."
+        end
+      else
+        domain.create_users(new_users, :ignore_failures => ignore_failures)
+        project.import_users(new_users , domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
       end
     end
   end
