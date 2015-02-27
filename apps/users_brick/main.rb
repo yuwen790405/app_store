@@ -7,6 +7,7 @@ require_relative 'vendor/middleware'
 include GoodData::Bricks
 
 p = GoodData::Bricks::Pipeline.prepare([
+  DecodeParamsMiddleware,
   LoggerMiddleware,
   BenchMiddleware,
   GoodDataMiddleware,
