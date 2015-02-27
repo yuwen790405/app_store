@@ -7,6 +7,7 @@ require_relative 'vendor/project'
 require_relative 'vendor/membership'
 require_relative 'vendor/profile'
 require_relative 'vendor/helpers'
+require_relative 'vendor/domain'
 
 include GoodData::Bricks
 
