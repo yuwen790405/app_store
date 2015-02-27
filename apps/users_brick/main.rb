@@ -1,9 +1,8 @@
 # encoding: utf-8
 
 require 'gooddata'
-require './user_brick'
-require './middleware'
-require './project'
+require 'users_brick'
+require_relative 'vendor/middleware'
 
 include GoodData::Bricks
 
