@@ -1,13 +1,5 @@
 # encoding: UTF-8
 
-require 'multi_json'
-require 'pmap'
-
-require_relative 'project'
-require_relative 'project_role'
-
-require_relative '../rest/object'
-
 module GoodData
   class Membership < GoodData::Rest::Object
     attr_reader :json

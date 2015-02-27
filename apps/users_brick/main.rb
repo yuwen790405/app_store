@@ -3,6 +3,10 @@
 require 'gooddata'
 require_relative 'users_brick'
 require_relative 'vendor/middleware'
+require_relative 'vendor/project'
+require_relative 'vendor/membership'
+require_relative 'vendor/profile'
+require_relative 'vendor/helpers'
 
 include GoodData::Bricks
 

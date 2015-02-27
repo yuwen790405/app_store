@@ -1,8 +1,5 @@
 # encoding: UTF-8
 
-require 'active_support/all'
-require 'pathname'
-
 module GoodData
   module Helpers
     class << self

@@ -1,11 +1,5 @@
 # encoding: UTF-8
 
-require 'pmap'
-
-require_relative '../rest/object'
-
-require_relative 'project'
-
 module GoodData
   class Profile < GoodData::Rest::Object
     attr_reader :user, :json
