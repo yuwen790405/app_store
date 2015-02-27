@@ -119,10 +119,12 @@ module GoodData
                  else
                    GoodData.connect(params['GDC_USERNAME'], params['GDC_PASSWORD'], server: server)
                  end
+        project = client.projects(project_id)
+        GoodData.project = project
         GoodData.logger = logger
         @app.call(params.merge({
           'GDC_GD_CLIENT' => client,
-          'gdc_project' => client.projects(project_id)
+          'gdc_project' => project
         }))
       end
     end
