@@ -123,7 +123,7 @@ module GoodData
         @app.call(params.merge({
           'GDC_GD_CLIENT' => client,
           'gdc_project' => client.projects(project_id)
-        })
+        }))
       end
     end
   end
