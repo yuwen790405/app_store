@@ -97,7 +97,7 @@ In many cases you want the same thing as in previous case. You have one source o
 The benefit here is that the process is deployed in each project so you have everything in one place and can orchestrate things easily using administration console. The problem with having many more processes and juggling with them is mitigated by the fact that Powered by GoodData applications are usually deployed automatically. Also if you remove a project all the ETL processes are removed with it so you do not have to consider any cleanup steps.
 
 
-![One to many in PBG](https://photos-2.dropbox.com/t/2/AABry4i5DsMEzuqg9aGaqXQUIekODQQlmsKsooIzhZnM8Q/12/125832525/png/1024x768/3/_/1/2/project_sync_mode_on_to_many_pbg.png/CM2agDwgASACIAMoAQ/o6-a9oOlTme4ph5_Aic5FfAHW-cXItB62MZiwGO2JUk)
+![One to many in PBG](https://www.dropbox.com/s/m0uzv3r4zwtq682/project_sync_mode_on_to_many_pbg.png?dl=0&raw=1)
 
 ### Parameters
 
