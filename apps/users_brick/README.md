@@ -34,7 +34,7 @@ So we can add users to project later we have to add the to organization first. A
 
 The way domain updates work is that all the users that you provided in the input file are added to the domain. If they are already in they are updated accordingly. The update affects only the fields you provided. If you did not provide specific field it will not be touched. To illustrate let's see an example
 
-![Updating user in organization](https://photos-2.dropbox.com/t/2/AABPuW2tfkRhva17wTvAagmuN_H-5rQz78hGEyFeB0HrJg/12/125832525/png/1024x768/3/1425520800/0/2/updating_user_in_org.png/CM2agDwgASACIAMoAQ/hqD1ZBz1DMProyCxvggT5ocfrV9cAZ4PN7JsCH8awp4)
+![Updating user in organization](https://www.dropbox.com/s/y5betor6loa6bn3/updating_user_in_org.png?dl=0&raw=1)
 
 Notice that while john's email was updated his first name was not.
 
@@ -56,7 +56,7 @@ Syncing with project process is taking a list of users as an input. Each line of
 
 To illustrate what is happening let's have a look at this picture.
 
-![Syncing users into project](https://photos-4.dropbox.com/t/2/AACbjGcZFHep434dDoAnsp3LtWHCHRD6xCBzzqcZcDe9_A/12/125832525/png/1024x768/3/1425520800/0/2/project_sync.png/CM2agDwgASACIAMoAQ/0qqREh5S0KWflyHFqG5zPAmhCdmidnhIckovVillHwY)
+![Syncing users into project](https://www.dropbox.com/s/1m83rgmcf9d936t/project_sync.png?dl=0&raw=1)
 
 The file is on the far left. The project and its current data are in the middle. We take these to and identify several groups of users.
 
@@ -87,7 +87,7 @@ The process takes a file synchronizes the organization and the goes forward to s
 ### Sync many projects in one process
 There are occasions where someone is maintaining an application with several projects. There are couple of projects like 10 or so. This mode allows a process to sync those projects all in one go. The file has to contain and additional information about what user should go to which project. The file is partitioned based on this information and each partition is used to sync a give project. The project information has to be provided in a form of Project ID (aka pid, project hash).
 
-![One to many sync in one process](https://photos-4.dropbox.com/t/2/AABrsND21GkvFEGFsWP8WcxsQ7SRDTVSuC8D1U-I_3ebFg/12/125832525/png/1024x768/3/1425585600/0/2/project_sync_mode_on_to_many.png/CM2agDwgASACIAMoAQ/HN93Vo6AlTPfuMs9BcpqUzYDXGLvfbmSOA90ToqEf6k)
+![One to many sync in one process](https://www.dropbox.com/s/dxok260opv7jy3r/project_sync_mode_on_to_many.png?dl=0&raw=1)
 
 This mode is meant for cases where a person is by hand managing small number of projects so having one process distributing the users allows him to have more manageable ETL. If you are in the Powered by GoodData and automating your deployment this is probably not your best bet and you should consider one of the following.
 
@@ -95,7 +95,6 @@ This mode is meant for cases where a person is by hand managing small number of 
 In many cases you want the same thing as in previous case. You have one source of data and you would like to each project to use just a subset. It is incovenient to prepare N different data files or N tables. How this mode differs from the previous mode is that each proejct has one process deployed and the process is responsible for filtering the data for that particular project and update just that one project (as opposed to update all projects in the previous case).
 
 The benefit here is that the process is deployed in each project so you have everything in one place and can orchestrate things easily using administration console. The problem with having many more processes and juggling with them is mitigated by the fact that Powered by GoodData applications are usually deployed automatically. Also if you remove a project all the ETL processes are removed with it so you do not have to consider any cleanup steps.
-
 
 ![One to many in PBG](https://www.dropbox.com/s/m0uzv3r4zwtq682/project_sync_mode_on_to_many_pbg.png?dl=0&raw=1)
 
