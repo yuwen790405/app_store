@@ -1,11 +1,11 @@
 Users Brick
 ==========
-This brick provides seamless user synchronization with your domain and/or project. It provides several modes of operations that suits several scenarios which we will explore below.
+This brick provides seamless user synchronization with your organization (domain) and/or project. It provides several modes of operations that suits several scenarios which we will explore below.
 
 ## Key Features:
 From a high level perspective this brick can do for you
 
-- Add users to domain
+- Add users to organization
 - Add/remove users to/from project
 - Update user contact information
 - Update user roles in a project
@@ -22,7 +22,7 @@ Project is a place where data reside. User can be invited to a project which all
 Set of permissions of a particular user in a given project. Example is 'can_invite_users'.
 
 ## What you need to get started:
-- The domain of the project
+- an organization and an organization admin (for getting those contact our support)
 
 ## How things work
 
@@ -67,22 +67,44 @@ The file is on the far left. The project and its current data are in the middle.
 
 ### Why declarative and not additive
 
-Let me explain shortly why we decided to go the declarative ('give me how the project should look like and I will make it so') way as opposed to additive ('let me know each day who to add and remove'). The benefit of being declarative is the fact that it is idempotent and it is stateless. If I give you the full file every day you know where you will end up regardless of how the project looks like right now. Even if you run things several times you end up in the same spot. If I give you an increment where you end up is dependent on the state of the project. If something goes wrong you probably have to get the full state. Thanks to this the declarative way is also self healing. If you make a mistake one day it is going to fix itself automatically when you fix the data.
+Let me explain shortly why we decided to go the declarative ('give me how the project should look like and I will make it so') way as opposed to additive ('let me know each day who to add and remove'). The benefit of being declarative is the fact that it is stateless. If I give you the full file every day you know where you will end up regardless of how the project looks like right now. Even if you run things several times you end up in the same spot. If I give you an increment where you end up is dependent on the state of the project. If something goes wrong (loss of users) you probably have to get the full state anyway. Thanks to this the declarative way is also self healing. If you make a mistake one day it is going to fix itself automatically when you fix the data.
 
-If the source system can provide only incremental data you have to do the extra work in your stateful ETL to provide a complete snapshot of the system (as you have to do  for other parts as well). Taking data from an intermediary storage has also another benefit is that you own the data you were using to perform the tasks.
+If the source system can provide only incremental data you have to do the extra work in your stateful ETL to provide a complete snapshot of the system (as you have to do for other parts as well). Taking data from an intermediary storage has also another benefit is that you own the data you were using to perform the tasks so if you need them later you can access them which is not necessarily guaranteed with data you do not own.
+
+### Whitelisting
+Typically you will have users in the project that are there for business reasons but also you will have there users that are there for various other reasons. Technical reasons (user deploying the ETL processes) various users from vendors etc. If we would do the synchronization strictly as described in the previous paragraph they would be removed every day as long as you would not add them to your data sources which typically does not make sense. You can whitelists users or classes of users so they are ommitted from the process of adding removing users. We recommend to use this as little as possible. You can specify list of users that should be left alone like this.
+
+	"whitelists" : ["etl_admin@gooddata.com"]
+
+
 
 ## Modes of synchronization
 
 The brick can operate in different modes. We implemented several modes that we find useful in our day to day usage. If something that would be useful for you is not here let us know the list is not meant to be definitive.
 
 ### Sync organization
-The process takes a file synchronizes the organization. That is it.
+The process takes a data source synchronizes the organization. That is it.
+
+#### Goodot deployment parameters
+	{
+	  "sync_mode": "add_only_to_domain",
+	  "domain": "domain_name",
+      "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" }
+    }
 
 ### Sync project
-The process takes a file and synchronizes the project. That is it.
+The process takes a data source and synchronizes the project. That is it. The users have to be in the organization already it they are not there the process would fail.
+
+#### Goodot deployment parameters
+	{
+	  "sync_mode": "sync_project",
+	  "domain": "domain_name",
+      "data_source": { "type": "web", "path": "https://gist.github.com/31231.txt" },
+      "whitelists" : ["etl_admin@gooddata.com"]
+    }
 
 ### Sync organization and project in one go
-The process takes a file synchronizes the organization and the goes forward to synchronize users in the project. The intended usage for this mode is a customer who has one project so there is no benefit in splitting the organization and project synchronization into 2 tasks. You can achieve the same effect by using 2 processes in a series. First syncing the organization and the second syncing the project.
+The process takes a data source synchronizes the organization and then goes forward to synchronize users in the project. The intended usage for this mode is a customer who has one project so there is no benefit in splitting the organization and project synchronization into 2 tasks. You can achieve the same effect by using 2 processes in a series. First syncing the organization and the second syncing the project.
 
 ### Sync many projects in one process
 There are occasions where someone is maintaining an application with several projects. There are couple of projects like 10 or so. This mode allows a process to sync those projects all in one go. The file has to contain and additional information about what user should go to which project. The file is partitioned based on this information and each partition is used to sync a give project. The project information has to be provided in a form of Project ID (aka pid, project hash).
@@ -91,12 +113,41 @@ There are occasions where someone is maintaining an application with several pro
 
 This mode is meant for cases where a person is by hand managing small number of projects so having one process distributing the users allows him to have more manageable ETL. If you are in the Powered by GoodData and automating your deployment this is probably not your best bet and you should consider one of the following.
 
-### Sync one project filtering based on project Id
+#### Goodot deployment parameters
+	{
+	  "sync_mode": "sync_project",
+	  "domain": "domain_name",
+      "data_source": { "type": "web", "path": "https://gist.github.com/31231.txt" },
+      "whitelists" : ["etl_admin@gooddata.com"]
+    }
+
+### Sync one project with filtering based on project Id
 In many cases you want the same thing as in previous case. You have one source of data and you would like to each project to use just a subset. It is incovenient to prepare N different data files or N tables. How this mode differs from the previous mode is that each proejct has one process deployed and the process is responsible for filtering the data for that particular project and update just that one project (as opposed to update all projects in the previous case).
 
 The benefit here is that the process is deployed in each project so you have everything in one place and can orchestrate things easily using administration console. The problem with having many more processes and juggling with them is mitigated by the fact that Powered by GoodData applications are usually deployed automatically. Also if you remove a project all the ETL processes are removed with it so you do not have to consider any cleanup steps.
 
 ![One to many in PBG](https://www.dropbox.com/s/m0uzv3r4zwtq682/project_sync_mode_on_to_many_pbg.png?dl=0&raw=1)
+
+
+### Sync one project with filtering based on custom project Id
+Consider situation that is the same as in previous mode. How would you actually implement getting the file that is an input for user sync processes? The project is specified by an ID that does not come from the customer and is not known upfront. You can learn it only after a new project is spun up. While this can be done (and occasionally is and that is the reason why we keep the previous mode) it is usually nontrivial to synchronize the processes. It is even more difficult if things get separated between customer and a consultancy company (customer provides data and info how many projects should be spun up and consultancy takes care of implementing the ETL).
+
+What customer can do is to generate an ID that for him internally identifies a project (we will call it Custom project ID). When some tool spins up a project it stores this id into project meta data storage. This creates the mapping between Project Id (that customer does not know) and Custom project Id. The flow of information is explained on the following picture.
+
+![](https://www.dropbox.com/s/ybgsch8lf810xqm/project_sync_mode_one_to_many_pbg_custom_id.png?dl=0&raw=1)
+
+Notice there are three distinct groups of processes (differentiated) by the color. The advantage that these things do not have to be synchronized and can run at their pace. Let's walk trhough the steps.
+
+* Red - Customer loads the data and at some point they are picked up and put into storage. His data contains the Custom Id that would allow us to piece things together without knowing in which physical project they would end up.
+* Yellow - at some point the process responsible for maintaining projects and deploying them wakes up. He notices there is need for spinning up a new project (Project 4) so he does that. Part of his responsibilities is to deploy an ETL process and mark the deployed project with 'Custom project Id'.
+* Green - At some point the ETL wakes up and processes data. If it runs it means that the data for this project is already in the 
+
+Let's have a look at how the ETL would run on the next picture.
+
+![Etl detail](https://www.dropbox.com/s/xqywmmnscg6v0bm/project_sync_mode_on_to_many_pbg_custom_id.png?dl=0&raw=1)
+
+At the top we have some datasets to illustrate data form the customer. There are 2 projects referenced by Custom Project Ids. And all the other datasets use the Custom project Id as a reference to project. Once the ETL is kicked off it would reach for the data and process them. One of the outputs would be also a file that would provide a data about users in particular project (bottom left).
+
 
 ### Parameters
 
@@ -120,11 +171,27 @@ The following list contains the properties that are useful to specify for updati
 For instance, if in your data first names would be stored in a column called "users_first_names", you would pass the params file: 
 
     {
-        :first_name_column => "users_first_names"
+      :first_name_column => "users_first_names"
     }
 
 
 As mentioned previously only login is really required all other columns will be provided with defaults if not specified.
 
+### Data sources
+In previous parts I was often talking about files or datasources. Generally we try not to force customer to do additional work and allow him to consume not just files but also let him specify SQL statements to ADS as a data source.
 
+#### File in the staging area
+Your file lies in the staging area which is accessible through various protocols most notably WEBDav. Here is how you configure it
 
+	"source": {
+	  "type": "staging",
+	  "path": "file"
+	}
+
+#### Table in ADS
+Data can be also provided as a query to ADS.
+
+	"source": {
+	  "type": "ads",
+	  "query": "SELECT * FROM my_table"
+	}
