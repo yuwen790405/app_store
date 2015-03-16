@@ -19,7 +19,7 @@ In context of this document organization is a cache of users. User has to be cre
 Project is a place where data reside. User can be invited to a project which allows him to perform certain operations according to his role(s).
 
 ### Role
-Set of permissions of a particular user in a given project. Example is 'can_invite_users'.
+Set of permissions of a particular user in a given project. Example of a permission can be 'can_invite_users'. Set of these will form a role which can be assigned to a user in project.
 
 ## What you need to get started:
 - an organization and an organization admin (for getting those contact our support)
@@ -30,7 +30,7 @@ Let's describe all the pieces that we need to understand and then have a look at
 
 ## Adding users to organization
 
-So we can add users to project later we have to add the to organization first. As stated previously organization contains information about users, their name, login, password etc. Organization is not connected to any project and the fact that a user is in a domain does not result in ability to access any project or data for him. Only organization admin can access the domain.
+So we can add users to project later we have to add the to organization first. As stated previously organization contains information about users, their name, login, password etc. Organization is not connected to any project and the fact that a user is in an organization does not result in ability to access any project or data in that project for him. Only organization admin can access the domain.
 
 The way domain updates work is that all the users that you provided in the input file are added to the domain. If they are already in they are updated accordingly. The update affects only the fields you provided. If you did not provide specific field it will not be touched. To illustrate let's see an example
 
@@ -72,11 +72,9 @@ Let me explain shortly why we decided to go the declarative ('give me how the pr
 If the source system can provide only incremental data you have to do the extra work in your stateful ETL to provide a complete snapshot of the system (as you have to do for other parts as well). Taking data from an intermediary storage has also another benefit is that you own the data you were using to perform the tasks so if you need them later you can access them which is not necessarily guaranteed with data you do not own.
 
 ### Whitelisting
-Typically you will have users in the project that are there for business reasons but also you will have there users that are there for various other reasons. Technical reasons (user deploying the ETL processes) various users from vendors etc. If we would do the synchronization strictly as described in the previous paragraph they would be removed every day as long as you would not add them to your data sources which typically does not make sense. You can whitelists users or classes of users so they are ommitted from the process of adding removing users. We recommend to use this as little as possible. You can specify list of users that should be left alone like this.
+Typically you will have users in the project that are there for business reasons but also you will have there users that are there for various other reasons. Technical reasons (user deploying the ETL processes) various users from vendors etc. If we would do the synchronization strictly as described in the previous paragraph they would be removed every day as long as you would not add them to your data sources which typically does not make sense. You can whitelists users or classes of users so they are omitted from the process of adding removing users. We recommend to use this as little as possible. You can specify list of users that should be left alone like this.
 
 	"whitelists" : ["etl_admin@gooddata.com"]
-
-
 
 ## Modes of synchronization
 
@@ -85,21 +83,21 @@ The brick can operate in different modes. We implemented several modes that we f
 ### Sync organization
 The process takes a data source synchronizes the organization. That is it.
 
-#### Goodot deployment parameters
-	{
-	  "sync_mode": "add_only_to_domain",
-	  "domain": "domain_name",
+#### Deployment parameters
+  	{
+  	  "sync_mode": "add_only_to_domain",
+  	  "domain": "domain_name",
       "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" }
     }
 
 ### Sync project
 The process takes a data source and synchronizes the project. That is it. The users have to be in the organization already it they are not there the process would fail.
 
-#### Goodot deployment parameters
-	{
-	  "sync_mode": "sync_project",
-	  "domain": "domain_name",
-      "data_source": { "type": "web", "path": "https://gist.github.com/31231.txt" },
+#### Deployment parameters
+	  {
+	    "sync_mode": "sync_project",
+	    "domain": "domain_name",
+      "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" },
       "whitelists" : ["etl_admin@gooddata.com"]
     }
 
@@ -113,11 +111,11 @@ There are occasions where someone is maintaining an application with several pro
 
 This mode is meant for cases where a person is by hand managing small number of projects so having one process distributing the users allows him to have more manageable ETL. If you are in the Powered by GoodData and automating your deployment this is probably not your best bet and you should consider one of the following.
 
-#### Goodot deployment parameters
-	{
-	  "sync_mode": "sync_project",
-	  "domain": "domain_name",
-      "data_source": { "type": "web", "path": "https://gist.github.com/31231.txt" },
+#### Deployment parameters
+	  {
+	    "sync_mode": "sync_project",
+	    "domain": "domain_name",
+      "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" },
       "whitelists" : ["etl_admin@gooddata.com"]
     }
 
@@ -180,7 +178,15 @@ As mentioned previously only login is really required all other columns will be 
 ### Data sources
 In previous parts I was often talking about files or datasources. Generally we try not to force customer to do additional work and allow him to consume not just files but also let him specify SQL statements to ADS as a data source.
 
-#### File in the staging area
+#### File from web
+Your file lies in the staging area which is accessible through various protocols most notably WEBDav. Here is how you configure it
+
+	"source": {
+	  "type": "web",
+	  "url": "https://gist.github.com/31231.txt"
+	}
+
+#### File in the staging area - not implemented yet
 Your file lies in the staging area which is accessible through various protocols most notably WEBDav. Here is how you configure it
 
 	"source": {
@@ -188,7 +194,7 @@ Your file lies in the staging area which is accessible through various protocols
 	  "path": "file"
 	}
 
-#### Table in ADS
+#### Table in ADS - not implemented yet
 Data can be also provided as a query to ADS.
 
 	"source": {
