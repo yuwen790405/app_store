@@ -9,11 +9,11 @@ Brick accepts data in adjacency tree. This means that representing this hierarch
 would be represented by file containing this data. It is convenient because it an be stored in a flat file or database file of a known structure.
 
  id | parent | department
-----|--------------------
- A  | B      | sales
- B  | A      | eng
- C  | A      | marketing
- D  | E      | support
+----|--------|-----------
+ A  | B      |  sales
+ B  | A      |  eng
+ C  | A      |  marketing
+ D  | E      |  support
  
 ##Types of output
 
@@ -43,6 +43,27 @@ This is much more nicer to work with visually. Try to find if E is a subordinate
 #### Additional fields
 You can provide names of additional fields that will be propagated from the source hierarchy.
 
+#### Deployment params
+
+params
+
+  {
+    'input_file' => 'input.csv',
+    'output_file' => 'output.csv',
+    'config' => {
+      'id' => 'id',
+      'manager_id' => 'parent_id'
+    },
+    'hierarchy_type' => 'subordinates_closure_tuples'
+  }
+
+secure params
+
+  {
+    'GDC_USERNAME' => 'login',
+    'GDC_PASSWORD' => 'secret'
+  }
+
 
 ### Fixed level hierarchy
 In certain cases it is very useful to flatten the hierarchy to a rectangular shape. This is useful if you would like to use the hierarchy as part of the dimension.
@@ -67,3 +88,23 @@ Our example fulfills both of the precondition and the output would look like thi
 #### Additional fields
 You can provide names of additional fields that will be propagated from the source hierarchy.
 
+#### Deployment params
+
+params
+
+  {
+    'input_file' => 'input.csv',
+    'output_file' => 'output.csv',
+    'config' => {
+      'id' => 'id',
+      'manager_id' => 'parent_id'
+    },
+    'hierarchy_type' => 'fixed_level'
+  }
+
+secure params
+
+  {
+    'GDC_USERNAME' => 'login',
+    'GDC_PASSWORD' => 'secret'
+  }
