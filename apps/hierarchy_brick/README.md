@@ -47,22 +47,22 @@ You can provide names of additional fields that will be propagated from the sour
 
 params
 
-  {
-    'input_file' => 'input.csv',
-    'output_file' => 'output.csv',
-    'config' => {
-      'id' => 'id',
-      'manager_id' => 'parent_id'
-    },
-    'hierarchy_type' => 'subordinates_closure_tuples'
-  }
+    {
+      "input_file": "input.csv",
+      "output_file": "output.csv",
+      "config": {
+        "id": "id",
+        "manager_id": "parent_id"
+      },
+      "hierarchy_type": "subordinates_closure_tuples"
+    }
 
 secure params
 
-  {
-    'GDC_USERNAME' => 'login',
-    'GDC_PASSWORD' => 'secret'
-  }
+    {
+      "GDC_USERNAME": "login",
+      "GDC_PASSWORD": "secret"
+    }
 
 
 ### Fixed level hierarchy
@@ -92,19 +92,19 @@ You can provide names of additional fields that will be propagated from the sour
 
 params
 
-  {
-    'input_file' => 'input.csv',
-    'output_file' => 'output.csv',
-    'config' => {
-      'id' => 'id',
-      'manager_id' => 'parent_id'
-    },
-    'hierarchy_type' => 'fixed_level'
-  }
+    {
+      "input_file": "input.csv",
+      "output_file": "output.csv",
+      "config": {
+        "id": "id",
+        "manager_id": "parent_id"
+      },
+      "hierarchy_type": "fixed_level"
+    }
 
 secure params
 
-  {
-    'GDC_USERNAME' => 'login',
-    'GDC_PASSWORD' => 'secret'
-  }
+    {
+      "GDC_USERNAME": "login",
+      "GDC_PASSWORD": "secret"
+    }
