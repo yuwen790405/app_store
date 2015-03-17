@@ -1,9 +1,0 @@
-{
-  "hierarchy_filepath" : "input.csv",
-  "config" : {
-    "id" : "id",
-    "manager_id" : "manager_id"
-  },
-  "output_fields" : [],
-  "hierarchy_type" : "subordinates_closure"
-}
