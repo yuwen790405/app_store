@@ -1,22 +1,22 @@
 # app_store
 
-App store is a place where you can take a code that solves specific problem. It provides a central repository and is maintained. Also the app in appstore represent years of condensed experience of what worked in the field.
+App store is a place where you can take piece of code that solves specific problem. App store also provides a central repository and its contents are curated, tested and maintained and it represent years of condensed experience and trial and error.
 
 ## Status
 
 [![Build Status](https://travis-ci.org/gooddata/app_store.svg)](https://travis-ci.org/gooddata/app_store)
 
 ### Brick
-Brick is the something that is in app_store. We might rename it since this is a working title but what we try to convey with the name is that it is something that should be part of bigger whole. In your ETL there are many problems and brick should solve one problem particularly well. It should be tested parametrizable and to some extent flexible but mainly it should play well within the larger system. Typical ETL might look like this
+Brick is the something that is in app_store and that you are going to use. This is a working title and it is likely to change but what we try to convey with the name is that it is something that should be part of bigger whole that plays along. In your ETL there are usually many problems but many of those repeat and thanks to us seeing many implementations we can see what is a recurring thing. Brick is something that should solve one problem particularly well. It should be tested, parametrizable, promote the right way to do it and to some extent flexible but mainly it should play well within the larger system.
 
 ### Ruby vs ?
-While all our bricks are currently written in ruby this is not mandatory. Brick can be in any language as long as it is supported within GoodData platform. Since majority of the bricks are currently dealing with APIs imperative language is the most flexible way to go.
+While all our bricks are currently written in Ruby this is not mandatory. Brick can be in any language as long as it is supported within GoodData platform. Since majority of the bricks are currently dealing with APIs imperative language is the most flexible way to go.
 
 ### Deployment
-You can deploy by cloning the app store and using a web interface in "Administration console" or you can use Automation SDK. You can both [deploy](https://github.com/gooddata/gooddata-ruby-examples/blob/master/07_deployment_recipes/01_process_deployment.asciidoc) and [redeploy](https://github.com/gooddata/gooddata-ruby-examples/blob/master/07_deployment_recipes/02_process_redeployment.asciidoc)
+You can find bricks in the [apps](https://github.com/gooddata/app_store/tree/master/apps) directory. Each folder there represent one brick. You can deploy by cloning the app store and using a web interface in "Administration console" or you can use Automation SDK. You can both [deploy](https://github.com/gooddata/gooddata-ruby-examples/blob/master/07_deployment_recipes/01_process_deployment.asciidoc) and [redeploy](https://github.com/gooddata/gooddata-ruby-examples/blob/master/07_deployment_recipes/02_process_redeployment.asciidoc) with it.
 
 ### Scheduling/Executing
-While deployment is tool agnostic. Scheduling has to be performed using Automation SDK. The reason for this is that gooddata platform currently does not support nested (JSON like) parameters which are necessary for concisely parametrize majority of the bricks. Automation SDK takes care of the details for you. The caveat is that in the Administration console you will see the data encoded (though still readable) the advantage is that configuration is much more readable.
+While deployment is tool agnostic. Scheduling has to be performed using Automation SDK at this point. The reason for this is that gooddata platform currently does not support nested (JSON like) parameters which are necessary for concisely parametrize majority of the bricks. Automation SDK takes care of the details for you. The caveat is that in the Administration console you will see the data encoded (though still readable) the advantage is that configuration is much more readable.
 
 You can read about various ways how to schedule processes in our [cookbook](https://github.com/gooddata/gooddata-ruby-examples/tree/master/07_deployment_recipes)
 

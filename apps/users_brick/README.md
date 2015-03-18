@@ -151,13 +151,12 @@ At the top we have some datasets to illustrate data form the customer. There are
 
 There are only couple of things you have to configure. For the rest sensible defaults are provided and you an override them if you need to. What you have to specify is the following
 
-
 #### Required parameters
 * file with the input data
 * name of domain
 
 #### Defaults
-The following list contains the properties that are useful to specify for updating a domain. The name after hyphen is the default. In parenthesis you can find name of the parameter you can use to override the default.
+The following list contains the properties that are useful to specify for updating an organization. The name after hyphen is the default. In parenthesis you can find name of the parameter you can use to override the default.
 
 * First name - first_name (first_name_column)
 * Last name - last_name (last_name_column)
@@ -166,38 +165,10 @@ The following list contains the properties that are useful to specify for updati
 * Email - email (email_column)
 * SSO Provider - sso_provider (sso_provider_column)
 
-For instance, if in your data first names would be stored in a column called "users_first_names", you would pass the params file: 
+For instance, if in your data first names would be stored in a column called "users_first_names", you would pass as param something along the lines of
 
     {
-      :first_name_column => "users_first_names"
+      "first_name_column": "users_first_names"
     }
 
-
 As mentioned previously only login is really required all other columns will be provided with defaults if not specified.
-
-### Data sources
-In previous parts I was often talking about files or datasources. Generally we try not to force customer to do additional work and allow him to consume not just files but also let him specify SQL statements to ADS as a data source.
-
-#### File from web
-Your file lies in the staging area which is accessible through various protocols most notably WEBDav. Here is how you configure it
-
-	"source": {
-	  "type": "web",
-	  "url": "https://gist.github.com/31231.txt"
-	}
-
-#### File in the staging area - not implemented yet
-Your file lies in the staging area which is accessible through various protocols most notably WEBDav. Here is how you configure it
-
-	"source": {
-	  "type": "staging",
-	  "path": "file"
-	}
-
-#### Table in ADS - not implemented yet
-Data can be also provided as a query to ADS.
-
-	"source": {
-	  "type": "ads",
-	  "query": "SELECT * FROM my_table"
-	}
