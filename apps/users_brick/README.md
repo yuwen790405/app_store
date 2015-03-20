@@ -132,13 +132,13 @@ The benefit here is that the process is deployed in each project so you have eve
 ![One to many in PBG](https://www.dropbox.com/s/m0uzv3r4zwtq682/project_sync_mode_on_to_many_pbg.png?dl=0&raw=1)
 
 #### Deployment parameters
-  {
-    "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
-    "sync_mode": "sync_one_project_based_on_pid",
-    "domain": "gooddata-tomas-svarovsky",
-    "multiple_projects_column", "project_id"
-    "whitelists" : ["etl_admin@gooddata.com"]
-  }
+    {
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
+      "sync_mode": "sync_one_project_based_on_pid",
+      "domain": "gooddata-tomas-svarovsky",
+      "multiple_projects_column", "project_id"
+      "whitelists" : ["etl_admin@gooddata.com"]
+    }
 
 ### Sync one project with filtering based on custom project Id
 Consider situation that is the same as in previous mode. How would you actually implement getting the file that is an input for user sync processes? The project is specified by an ID that does not come from the customer and is not known upfront. You can learn it only after a new project is spun up. While this can be done (and occasionally is and that is the reason why we keep the previous mode) it is usually nontrivial to synchronize the processes. It is even more difficult if things get separated between customer and a consultancy company (customer provides data and info how many projects should be spun up and consultancy takes care of implementing the ETL).
