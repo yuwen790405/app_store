@@ -84,25 +84,29 @@ The brick can operate in different modes. We implemented several modes that we f
 The process takes a data source synchronizes the organization. That is it.
 
 #### Deployment parameters
+
   	{
-  	  "sync_mode": "add_only_to_domain",
-  	  "domain": "domain_name",
-      "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" }
+  	  "sync_mode": "add_to_organization",
+  	  "domain": "organization_name",
+      "data_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" }
     }
 
 ### Sync project
 The process takes a data source and synchronizes the project. That is it. The users have to be in the organization already it they are not there the process would fail.
 
 #### Deployment parameters
-	  {
-	    "sync_mode": "sync_project",
-	    "domain": "domain_name",
-      "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" },
-      "whitelists" : ["etl_admin@gooddata.com"]
+
+    {
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
+      "sync_mode": "sync_project",
+      "domain": "gooddata-tomas-svarovsky",
+      "whitelists" : ["svarovsky+gem_tester@gooddata.com"]
     }
 
 ### Sync organization and project in one go
 The process takes a data source synchronizes the organization and then goes forward to synchronize users in the project. The intended usage for this mode is a customer who has one project so there is no benefit in splitting the organization and project synchronization into 2 tasks. You can achieve the same effect by using 2 processes in a series. First syncing the organization and the second syncing the project.
+
+!! Fill in PARAMS
 
 ### Sync many projects in one process
 There are occasions where someone is maintaining an application with several projects. There are couple of projects like 10 or so. This mode allows a process to sync those projects all in one go. The file has to contain and additional information about what user should go to which project. The file is partitioned based on this information and each partition is used to sync a give project. The project information has to be provided in a form of Project ID (aka pid, project hash).
@@ -112,10 +116,11 @@ There are occasions where someone is maintaining an application with several pro
 This mode is meant for cases where a person is by hand managing small number of projects so having one process distributing the users allows him to have more manageable ETL. If you are in the Powered by GoodData and automating your deployment this is probably not your best bet and you should consider one of the following.
 
 #### Deployment parameters
+
 	  {
-	    "sync_mode": "sync_project",
-	    "domain": "domain_name",
-      "data_source": { "type": "web", "url": "https://gist.github.com/31231.txt" },
+	    "sync_mode": "sync_multiple_projects_based_on_pid",
+	    "domain": "organization_name",
+      "data_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
       "whitelists" : ["etl_admin@gooddata.com"]
     }
 
@@ -126,6 +131,14 @@ The benefit here is that the process is deployed in each project so you have eve
 
 ![One to many in PBG](https://www.dropbox.com/s/m0uzv3r4zwtq682/project_sync_mode_on_to_many_pbg.png?dl=0&raw=1)
 
+#### Deployment parameters
+  {
+    "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
+    "sync_mode": "sync_one_project_based_on_pid",
+    "domain": "gooddata-tomas-svarovsky",
+    "multiple_projects_column", "project_id"
+    "whitelists" : ["etl_admin@gooddata.com"]
+  }
 
 ### Sync one project with filtering based on custom project Id
 Consider situation that is the same as in previous mode. How would you actually implement getting the file that is an input for user sync processes? The project is specified by an ID that does not come from the customer and is not known upfront. You can learn it only after a new project is spun up. While this can be done (and occasionally is and that is the reason why we keep the previous mode) it is usually nontrivial to synchronize the processes. It is even more difficult if things get separated between customer and a consultancy company (customer provides data and info how many projects should be spun up and consultancy takes care of implementing the ETL).
