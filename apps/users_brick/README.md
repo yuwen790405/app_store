@@ -160,15 +160,17 @@ Let's have a look at how the ETL would run on the next picture.
 At the top we have some datasets to illustrate data form the customer. There are 2 projects referenced by Custom Project Ids. And all the other datasets use the Custom project Id as a reference to project. Once the ETL is kicked off it would reach for the data and process them. One of the outputs would be also a file that would provide a data about users in particular project (bottom left).
 
 
-### Parameters
+### Column parameters
 
-There are only couple of things you have to configure. For the rest sensible defaults are provided and you an override them if you need to. What you have to specify is the following
+#### Data
+Typical data that serve as an input might look something like this. Or there is an example on [gist](https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv)
 
-#### Required parameters
-* file with the input data
-* name of domain
+  project_id                      |  login                 | first_name  | last_name      | role  |
+----------------------------------|------------------------|-------------|----------------|-------|
+tspv1le9afb94q47pehiub568ubkkqqw  | john.doe@example.com   | John        | Doe            | admin |
+tspv1le9afb94q47pehiub568ubkkqqw  | jane.doe@example.com   | Jane        | Doe            | admin |
 
-#### Defaults
+#### Column name defaults
 The following list contains the properties that are useful to specify for updating an organization. The name after hyphen is the default. In parenthesis you can find name of the parameter you can use to override the default.
 
 * First name - first_name (first_name_column)
@@ -178,10 +180,16 @@ The following list contains the properties that are useful to specify for updati
 * Email - email (email_column)
 * SSO Provider - sso_provider (sso_provider_column)
 
-For instance, if in your data first names would be stored in a column called "users_first_names", you would pass as param something along the lines of
+For instance, if in your data first names would be stored in a column called "x", you would pass as param something along the lines of
 
     {
-      "first_name_column": "users_first_names"
+      "first_name_column": "x"
     }
 
-As mentioned previously only login is really required all other columns will be provided with defaults if not specified.
+Your data file then should look like this
+
+  project_id                      |  login                 | x           | last_name      | role  |
+----------------------------------|------------------------|-------------|----------------|-------|
+tspv1le9afb94q47pehiub568ubkkqqw  | john.doe@example.com   | John        | Doe            | admin |
+tspv1le9afb94q47pehiub568ubkkqqw  | jane.doe@example.com   | Jane        | Doe            | admin |
+
