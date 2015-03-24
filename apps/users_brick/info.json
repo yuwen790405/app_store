@@ -1,5 +1,5 @@
 {
-  "name"       : "user_brick",
+  "name"       : "users_brick",
   "version"    : "0.0.1",
   "category"   : "api_tools",
   "language"   : "ruby",

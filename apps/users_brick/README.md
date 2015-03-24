@@ -1,5 +1,5 @@
 Users Brick
-==========
+===========
 This brick provides seamless user synchronization with your organization (domain) and/or project. It provides several modes of operations that suits several scenarios which we will explore below.
 
 ## Key Features:

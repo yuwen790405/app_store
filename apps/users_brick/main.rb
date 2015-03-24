@@ -1,13 +1,11 @@
 # encoding: utf-8
-
+require 'bundler/cli'
+Bundler::CLI.new.invoke(:install, [], path: 'gems', verbose: true)
+require 'bundler/setup'
 require 'gooddata'
+
 require_relative 'users_brick'
-require_relative 'vendor/middleware'
-require_relative 'vendor/project'
-require_relative 'vendor/membership'
-require_relative 'vendor/profile'
-require_relative 'vendor/helpers'
-require_relative 'vendor/domain'
+require_relative 'vendor/dwh_middleware'
 
 include GoodData::Bricks
 
@@ -16,7 +14,7 @@ p = GoodData::Bricks::Pipeline.prepare([
   LoggerMiddleware,
   BenchMiddleware,
   GoodDataMiddleware,
-  FsProjectDownloadMiddleware.new(:source => :staging),
+  WarehouseMiddleware,
   FsProjectUploadMiddleware.new(:destination => :staging),
   UsersBrick])
 

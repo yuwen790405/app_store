@@ -6,7 +6,7 @@ require 'gooddata'
 module GoodData::Bricks
 
   class UsersBrick < GoodData::Bricks::Brick
-    MODES = %w(add_only_to_domain sync_domain_and_project sync_multiple_projects_based_on_pid sync_one_project_based_on_pid sync_one_project_based_on_custom_id)
+    MODES = %w(add_to_organization sync_project sync_domain_and_project sync_multiple_projects_based_on_pid sync_one_project_based_on_pid sync_one_project_based_on_custom_id)
 
     def version
       "0.0.1"
@@ -16,7 +16,8 @@ module GoodData::Bricks
       client = params['GDC_GD_CLIENT'] || fail('client needs to be passed into a brick as "GDC_GD_CLIENT"')
       domain_name = params['domain']
       project = client.projects(params['gdc_project']) || client.projects(params['GDC_PROJECT_ID'])
-      csv_path = params['csv_path']
+      fail 'input_source has to be defined' unless params['input_source']
+      data_source = GoodData::Helpers::DataSource.new(params['input_source'])
       mode = params['sync_mode']
       unless mode.nil? || MODES.include?(mode)
         fail "The parameter \"sync_mode\" has to have one of the values #{MODES.map(&:to_s).join(', ')} or has to be empty."
@@ -26,10 +27,10 @@ module GoodData::Bricks
       multiple_projects_column = params['multiple_projects_column']
 
       # Check mandatory columns and parameters
-      mandatory_params = [domain_name, csv_path]
+      mandatory_params = [domain_name, data_source]
 
       mandatory_params.each do |param|
-        fail param+' is required in the block parameters.' unless param
+        fail param + ' is required in the block parameters.' unless param
       end
 
       domain = client.domain(domain_name)
@@ -48,7 +49,8 @@ module GoodData::Bricks
 
       new_users = []
       
-      CSV.foreach(File.open(csv_path, 'r:UTF-8'), :headers => true, :return_headers => false, encoding:'utf-8') do |row|
+      CSV.foreach(File.open(data_source.realize(params), 'r:UTF-8'), :headers => true, :return_headers => false, encoding:'utf-8') do |row|
+        
         new_users << {
           :first_name => row[first_name_column],
           :last_name => row[last_name_column],
@@ -56,10 +58,9 @@ module GoodData::Bricks
           :password => row[password_column],
           :email => row[email_column] || row[login_column],
           :role => row[role_column],
-          :domain => domain_name,
           :sso_provider => sso_provider || row[sso_provider_column],
           :pid => multiple_projects_column.nil? ? nil : row[multiple_projects_column]
-        }
+        }.compact
       end
 
       # There are several scenarios we want to provide with this brick
@@ -76,9 +77,11 @@ module GoodData::Bricks
       #     aiming at solving the problem that the customer cannot give us the
       #     value of a project id in the data since he does not know it upfront
       #     and we cannot influence its value.
-      case mode
-      when 'add_only_to_domain'
-        domain.create_users(new_users, :ignore_failures => ignore_failures)
+      results = case mode
+      when 'add_to_organization'
+        domain.create_users(new_users)
+      when 'sync_project'
+        project.import_users(new_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
       when 'sync_multiple_projects_based_on_pid'
         new_users.group_by {|u| u[:pid]}.map do |project_id, users|
           project = client.projects(project_id)
@@ -92,6 +95,7 @@ module GoodData::Bricks
         if md['GOODOT_CUSTOM_PROJECT_ID']
           filter_value = md['GOODOT_CUSTOM_PROJECT_ID']
           filtered_users = new_users.select { |u| u[:pid] == filter_value }
+          puts "Project #{project.pid} will receive #{filtered_users.count} from #{new_users.count} users"
           project.import_users(filtered_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
         else
           fail "Project \"#{project.pid}\" metadata does not contain key GOODOT_CUSTOM_PROJECT_ID. We are unable to get the value to filter users."
@@ -99,6 +103,16 @@ module GoodData::Bricks
       else
         domain.create_users(new_users, :ignore_failures => ignore_failures)
         project.import_users(new_users , domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+      end
+
+      counts = results.group_by { |r| r[:type] }.map {|g, r| [g, r.count]}
+      counts.each do |category, count|
+        puts "There were #{count} events of type #{category}"
+      end
+      errors = results.select {|r| r[:type] == :error}
+      unless errors.empty?
+        pp errors.take(10)
+        fail 'There was an error syncing users'
       end
     end
   end
