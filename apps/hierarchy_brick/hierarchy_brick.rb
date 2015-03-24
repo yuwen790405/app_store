@@ -3,8 +3,6 @@
 require 'open-uri'
 require 'csv'
 require 'gooddata'
-require_relative 'vendor/user_hierarchies/lib/user_hierarchies'
-require_relative 'vendor/middleware'
 
 module GoodData::Bricks
   class HierarchyBrick < GoodData::Bricks::Brick
@@ -22,14 +20,14 @@ module GoodData::Bricks
     end 
 
     def call(params)
-      input_file = params['input_file']
-      output_file = params['output_file']
+      data_source = GoodData::Helpers::DataSource.new(params['input_source'])
+      output_file = params['output_source']
 
       config = params['config']
       output_fields = params['output_fields'] || []
       hierarchy_type = params['hierarchy_type']
       symbolized_config = config.symbolize_keys
-      user_hierarchy = GoodData::UserHierarchies::UserHierarchy.read_from_csv(input_file, symbolized_config)
+      user_hierarchy = GoodData::UserHierarchies::UserHierarchy.read_from_csv(data_source.realize(params), symbolized_config)
       results = case hierarchy_type.to_sym
       when :fixed_level
         fixed_level_hierarchy(user_hierarchy, output_fields)

@@ -10,10 +10,12 @@ would be represented by file containing this data. It is convenient because it a
 
  id | parent | department
 ----|--------|-----------
+ A  |        |  sales
  A  | B      |  sales
  B  | A      |  eng
  C  | A      |  marketing
  D  | E      |  support
+ E  | B      |  support
  
 ##Types of output
 
@@ -48,8 +50,8 @@ You can provide names of additional fields that will be propagated from the sour
 params
 
     {
-      "input_file": "input.csv",
-      "output_file": "output.csv",
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/13359c90a8aa0d6b4c77/raw/03305f80d328220070728eee139740b56d96301a/test_hierarchy.csv" },
+      "output_source": "output.csv",
       "config": {
         "id": "id",
         "manager_id": "parent_id"
@@ -93,8 +95,8 @@ You can provide names of additional fields that will be propagated from the sour
 params
 
     {
-      "input_file": "input.csv",
-      "output_file": "output.csv",
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/13359c90a8aa0d6b4c77/raw/03305f80d328220070728eee139740b56d96301a/test_hierarchy.csv" },
+      "output_source": "output.csv",
       "config": {
         "id": "id",
         "manager_id": "parent_id"
