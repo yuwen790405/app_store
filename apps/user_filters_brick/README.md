@@ -50,7 +50,7 @@ While column based file is the most commonly used source but imagine that a diff
   Note: Please use your imagination and fancy that the table does not have headers. Unfortunately Markdown does not seem to support that :-)
 
   .                 | .
- -------------------|---------------------------------------
+--------------------|---------------------------------------
  john@example.com   | "San Francisco", "Prague", "Amsterdam"
  jane@example.com   | "Dublin", "San Francisco"
  
@@ -62,48 +62,48 @@ Notice that this file cannot have headers since we do not know how many columns 
 
 This is what we need to set up.
 
-  john@example.com: WHERE city IN ('San Francisco')
-  jane@example.com: WHERE city IN ('San Francisco', 'Prague')
+    john@example.com: WHERE city IN ('San Francisco')
+    jane@example.com: WHERE city IN ('San Francisco', 'Prague')
 
 This is how the file looks like
 
-  john@example.com,'San Francisco'
-  jane@example.com,'Prague'
-  jane@example.com,'San Francisco'
+    john@example.com,'San Francisco'
+    jane@example.com,'Prague'
+    jane@example.com,'San Francisco'
 
 This is how you have to set up your process
 
-  {
-    "domain": "",
-    "filters_setup": {
-      "": "",
+    {
+      "domain": "",
+      "filters_setup": {
+        "": "",
+        "": ""
+      },
       "": ""
-    },
-    "": ""
-  }
+    }
 
 ### Data permissions through value enumeration with row based file
 
 This is what we need to set up.
 
-  john@example.com: WHERE city IN ('San Francisco')
-  jane@example.com: WHERE city IN ('San Francisco', 'Prague')
+    john@example.com: WHERE city IN ('San Francisco')
+    jane@example.com: WHERE city IN ('San Francisco', 'Prague')
 
 This is how the file looks like
 
-  john@example.com,'San Francisco','Prague'
-  jane@example.com,'San Francisco'
+    john@example.com,'San Francisco','Prague'
+    jane@example.com,'San Francisco'
 
 This is how you have to set up your process
 
-  {
-    "domain": "",
-    "filters_setup": {
-      "": "",
+    {
+      "domain": "",
+      "filters_setup": {
+        "": "",
+        "": ""
+      },
       "": ""
-    },
-    "": ""
-  }
+    }
 
 ### Data permissions edge cases and other considerations
 
@@ -113,11 +113,11 @@ Absence of a filter means that user has full access to all data. This is is fair
 #### Dealing with missing values
 Data filters are not living in isolation. They are not even containing the values. When you are setting a filter
 
-  john@example.com: WHERE city IN ('San Francisco')
+    john@example.com: WHERE city IN ('San Francisco')
 
 What is actually sent to the API is something more like
 
-  john@example.com: WHERE [/gdc/md/obs5uxo2y5atzzx6jx9dpkbwfuttekju/obj/2022] IN ([/gdc/md/obs5uxo2y5atzzx6jx9dpkbwfuttekju/obj/2021?element_id=34])
+    john@example.com: WHERE [/gdc/md/obs5uxo2y5atzzx6jx9dpkbwfuttekju/obj/2022] IN ([/gdc/md/obs5uxo2y5atzzx6jx9dpkbwfuttekju/obj/2021?element_id=34])
 
 What does this mean for you is basically that when you are trying to use some value in the filter it has to be loaded in the project as an attribute element of that particular attribute. If this is not the case several thing might happen
 
