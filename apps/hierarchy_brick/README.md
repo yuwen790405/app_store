@@ -47,8 +47,6 @@ You can provide names of additional fields that will be propagated from the sour
 
 #### Deployment params
 
-params
-
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/13359c90a8aa0d6b4c77/raw/03305f80d328220070728eee139740b56d96301a/test_hierarchy.csv" },
       "output_source": "output.csv",
@@ -58,14 +56,6 @@ params
       },
       "hierarchy_type": "subordinates_closure_tuples"
     }
-
-secure params
-
-    {
-      "GDC_USERNAME": "login",
-      "GDC_PASSWORD": "secret"
-    }
-
 
 ### Fixed level hierarchy
 In certain cases it is very useful to flatten the hierarchy to a rectangular shape. This is useful if you would like to use the hierarchy as part of the dimension.
@@ -92,8 +82,6 @@ You can provide names of additional fields that will be propagated from the sour
 
 #### Deployment params
 
-params
-
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/13359c90a8aa0d6b4c77/raw/03305f80d328220070728eee139740b56d96301a/test_hierarchy.csv" },
       "output_source": "output.csv",
@@ -102,11 +90,4 @@ params
         "manager_id": "parent_id"
       },
       "hierarchy_type": "fixed_level"
-    }
-
-secure params
-
-    {
-      "GDC_USERNAME": "login",
-      "GDC_PASSWORD": "secret"
     }
