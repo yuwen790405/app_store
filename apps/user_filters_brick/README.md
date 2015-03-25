@@ -125,15 +125,12 @@ What does this mean for you is basically that when you are trying to use some va
 2. If you are feeling lucky you can change the default behavior. What the brick tries to do is to omit the invalid values. Imagine you are trying to set this filter
 
     john@example.com: WHERE city IN ('San Francisco', 'Prague')
-
 and value 'Prague' is not in the data. Brick will try to set up the filter
 
     john@example.com: WHERE city IN ('San Francisco')
-
 This is fine. Prague is not in the data so it does not matter we are not restricting the user to see that. But what would happen if we do not have even 'San Francisco' in our data? The expression
 
     john@example.com: WHERE city IN ()
-
 is not valid so brick drops the filter altogether which means that user has access to all data.
 3. Is the same as case 2 but when the valid values are exhausted user is denied access.
 
