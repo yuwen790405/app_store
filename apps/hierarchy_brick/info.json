@@ -6,6 +6,7 @@
   "tags"       : "ruby hierarchy transformation",
   "description" : "Hierarchy brick provides couple of transformations from adjacency list to other types of hierarchy representation that are useful in GD.",
   "is_live"    : true,
+  "created": "",
   "parameters" : [
     {
       "name"        : "input_source",

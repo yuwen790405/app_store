@@ -4,6 +4,7 @@
   "category"   : "prebuilt-etl",
   "language"   : "ruby",
   "tags"       : "etl salesforce security",
+  "created"    : "",
   "parameters" : [
     {
       "name"        : "users_filename",
