@@ -1,0 +1,9 @@
+source 'https://rubygems.org'
+
+gem 'json','1.8.1'
+gem 'ffi','1.9.3'
+gem 'gooddata','0.6.12'
+gem 'rubyzip','1.1.6'
+gem "gooddata_connectors_base", :git => 'https://github.com/gooddata/gooddata_connectors_base.git', :branch => "s3"
+gem "gooddata_connectors_metadata", :git => "https://github.com/gooddata/gooddata_connectors_metadata", :branch => "bds_implementation"
+gem "gooddata_connectors_downloader_sql", :git => "https://github.com/adriantoman/gooddata_connectors_downloader_sql.git"
