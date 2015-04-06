@@ -56,6 +56,17 @@ While column based file is the most commonly used source but imagine that a diff
  
 Notice that this file cannot have headers since we do not know how many columns we will have  (They are d).
 
+## Adding filters
+
+Regardless of which type of source you use to define your filters the information you provide will be used as the blueprint for the end state of the project. It is very similar to how adding user works. You are providing how the end state should look like and the system determines what to do.
+
+### Why declarative and not additive
+
+Let me explain shortly why we decided to go the declarative ('give me how the project should look like and I will make it so') way as opposed to additive ('let me know each day who to add and remove'). The benefit of being declarative is the fact that it is stateless. If I give you the full file every day you know where you will end up regardless of how the project looks like right now. Even if you run things several times you end up in the same spot. If I give you an increment where you end up is dependent on the state of the project. If something goes wrong (loss of users) you probably have to get the full state anyway. Thanks to this the declarative way is also self healing. If you make a mistake one day it is going to fix itself automatically when you fix the data.
+
+If the source system can provide only incremental data you have to do the extra work in your stateful ETL to provide a complete snapshot of the system (as you have to do for other parts as well). Taking data from an intermediary storage has also another benefit is that you own the data you were using to perform the tasks so if you need them later you can access them which is not necessarily guaranteed with data you do not own.
+
+
 ## Use cases
 
 ### Data permissions through value enumeration with column based file
@@ -74,13 +85,17 @@ This is how the file looks like
 This is how you have to set up your process
 
     {
-      "domain": "",
+      "domain": "my_domain",
       "filters_setup": {
-        "": "",
-        "": ""
-      },
-      "": ""
+        "user_column": "login",
+        "labels": [{"label": "label.devs.dev_id.email", "column": "email"}]
+      }
     }
+
+Notes:
+
+1) You can also use numbers to specify the "user_column" or "column" to be used in case you do not have headers.
+2) If your file does not have a header you have to explicitly specify it using `csv_headers` parameter.
 
 ### Data permissions through value enumeration with row based file
 
@@ -98,9 +113,9 @@ This is how you have to set up your process
 
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/7fdd8453c3c811ccc5a9/raw/155f6fd8414135e16994f30c2d6b16356872001c/gistfile1.txt" },
-      "filters_config": {
-        "user_column": "login",
-        "labels": [{"label": "label.devs.dev_id.email", "column": "city"}]
+      "filters_setup": {
+        "user_column": 0,
+        "labels": [{"label": "label.devs.dev_id.email"}]
       }
     }
 
@@ -149,4 +164,3 @@ is not valid so brick drops the filter altogether which means that user has acce
 Since we are talking about security it is mandatory that users are restricted before they are added into project. Brick can help you with this tremendously. All you need to do is set up an organization and set up proper processes (for example using our users_brick) so the users are there. Data filters brick can take users from domain set up their data permissions before they are actually added to the project. If you add them afterwards they have restricted access right from the start. The only thing you have to worry about is properly orchestrate the pieces and make sure users are first set up with their filters and only then added to project (best way of doing that is using the users_brick from the appstore). The picture below illustrates the situation.
 
 We believe it is so important that we added the `domain` parameter as part of all the examples above. You should not do it any other way unless you have pretty good reason.
-
