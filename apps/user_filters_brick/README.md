@@ -97,12 +97,22 @@ This is how the file looks like
 This is how you have to set up your process
 
     {
-      "domain": "",
-      "filters_setup": {
-        "": "",
-        "": ""
-      },
-      "": ""
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/7fdd8453c3c811ccc5a9/raw/155f6fd8414135e16994f30c2d6b16356872001c/gistfile1.txt" },
+      "filters_config": {
+        "user_column": "login",
+        "labels": [{"label": "label.devs.dev_id.email", "column": "city"}]
+      }
+    }
+
+### Support for over-to filters
+Over to filters are useful in cases where there are so many individual values that need to be set up for each users that it is no longer practical to have them all in the filter. Rule of thumb is when number of values per user hits high hundreds. You can set up a dataset which contains all the values and you can set up the filter to look in that particular dataset for values. The upside of this solution is that it can handle more values and also simplifies the filters. The drawback with this is that you have to put additional datasets in the model which complicate the model.
+
+    {
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/7fdd8453c3c811ccc5a9/raw/155f6fd8414135e16994f30c2d6b16356872001c/gistfile1.txt" },
+      "filters_config": {
+        "user_column": "login",
+        "labels": [{"label": "label.devs.dev_id.email", "column": "city", "over": "/gdc/md/obs5uxo2y5atzzx6jx9dpkbwfuttekju/obj/2022", "to": "/gdc/md/obs5uxo2y5atzzx6jx9dpkbwfuttekju/obj/2023"}]
+      }
     }
 
 ### Data permissions edge cases and other considerations
@@ -136,7 +146,7 @@ is not valid so brick drops the filter altogether which means that user has acce
 
 #### Restricting users vs adding users into the project
 
-Since we are talking about security it is mandatory that users are restricted before they are added into project. Brick can help you with this tremendously. All you need to do is set up an organization and set up proper processes (for example using our users_brick) so the users are there. Data filters brick can take users from domain set up their data permissions before they are actually added to the project. If you add them afterwards they are have restricted access right from the start. The only thing you have to worry about is properly orchestrate the pieces and makes sure users are first set up with their filters and only then added to project. The picture below illustrates the situation.
+Since we are talking about security it is mandatory that users are restricted before they are added into project. Brick can help you with this tremendously. All you need to do is set up an organization and set up proper processes (for example using our users_brick) so the users are there. Data filters brick can take users from domain set up their data permissions before they are actually added to the project. If you add them afterwards they have restricted access right from the start. The only thing you have to worry about is properly orchestrate the pieces and make sure users are first set up with their filters and only then added to project (best way of doing that is using the users_brick from the appstore). The picture below illustrates the situation.
 
 We believe it is so important that we added the `domain` parameter as part of all the examples above. You should not do it any other way unless you have pretty good reason.
 
