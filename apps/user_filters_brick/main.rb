@@ -1,12 +1,16 @@
+# encoding: utf-8
+require 'bundler/cli'
+Bundler::CLI.new.invoke(:install, [], path: 'gems', verbose: true)
+require 'bundler/setup'
 require 'gooddata'
-require './user_filters'
-require './middleware'
-require './project'
-require './user_filters_brick'
+
+require_relative 'user_filters_brick'
+require_relative 'vendor/dwh_middleware'
 
 include GoodData::Bricks
 
 p = GoodData::Bricks::Pipeline.prepare([
+  DecodeParamsMiddleware,
   LoggerMiddleware,
   BenchMiddleware,
   GoodDataMiddleware,
@@ -14,6 +18,4 @@ p = GoodData::Bricks::Pipeline.prepare([
   FsProjectUploadMiddleware.new(:destination => :staging),
   UserFiltersBrick])
 
-params = $SCRIPT_PARAMS.to_hash
-expanded_params = params.merge(MultiJson.load(params["params"]))
-p.call(expanded_params)
+p.call($SCRIPT_PARAMS.to_hash)
