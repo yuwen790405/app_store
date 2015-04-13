@@ -16,6 +16,7 @@ p = GoodData::Bricks::Pipeline.prepare([
   GoodDataMiddleware,
   FsProjectDownloadMiddleware.new(:source => :staging),
   FsProjectUploadMiddleware.new(:destination => :staging),
+  WarehouseMiddleware,
   UserFiltersBrick])
 
 p.call($SCRIPT_PARAMS.to_hash)
