@@ -77,11 +77,11 @@ The feed file is providing information about the structure of the provided data 
 
 The structure of the file should look like this:
 
- * file - name of the entity, to which this row is connected
- * version - the version of file to which the row is connected (this is used for further changes of uploaded CSV files). For example that customer wants to add one column to the source CSV file. We know that in version 1.0 the column was not there and in version 1.1 the columns was there. This will allow us to reprocess the historical data without any changes to FEED file
- * field - name of the field (column in source file)
- * type - the data type of the field (the supported types are stated at the end of this section)
- * order - the order in which the fields are ordered in source files
+ * **file** - name of the entity, to which this row is connected
+ * **version** - the version of file to which the row is connected (this is used for further changes of uploaded CSV files). For example that customer wants to add one column to the source CSV file. We know that in version 1.0 the column was not there and in version 1.1 the columns was there. This will allow us to reprocess the historical data without any changes to FEED file
+ * **field** - name of the field (column in source file)
+ * **type** - the data type of the field (the supported types are stated at the end of this section)
+ * **order** - the order in which the fields are ordered in source files
 
 #### Example:
 
@@ -105,21 +105,21 @@ The structure of the file should look like this:
 The second file if manifest file. This file will bind the uploaded files to one batch and this batch of files will be processed as one. The manifest file need to follow specific name convention:
 manifest-{batch_identification}_{sequence}.{time}
 
- * batch_identification - string which identifies batch. It is possible to group uploaded files to multiple batches (for example when each fie is loaded in different time window). Batch identification can be for example batchA and batchB.
- * sequence - sequence number of manifest files. The files uploaded on to the source need to follow the sequence. In case that sequence is broken, the batch will not be processed and connector will wait till the missing sequence is loaded.
- * time - time of manifest creation in format YYYYMMDDHHMMSS (for example 20150217104924). The format can be easily change if needed.
+ * **batch_identification** - string which identifies batch. It is possible to group uploaded files to multiple batches (for example when each fie is loaded in different time window). Batch identification can be for example batchA and batchB.
+ * **sequence** (optional) - sequence number of manifest files. The files uploaded on to the source need to follow the sequence. In case that sequence is broken, the batch will not be processed and connector will wait till the missing sequence is loaded.
+ * **time** - time of manifest creation in format YYYYMMDDHHMMSS (for example 20150217104924). The format can be easily change if needed.
 
 The name of the manifest can look like this: **manifest-batchB_1.20150217104924.csv**
 
 The structure of the file should look like this:
 
- * file_url - full path to desired file uploaded on storage
- * target_ads - **OBSOLETE**
- * timestamp - unix timestamp representing time when file was uploaded on storage
- * feed - name of entity, to which the file is connected
- * feed_version - the version in FEED file to which the uploaded file is connected ( **only one version of entity can be present in manifest file** - you cannot have Account v1.0 and Account v2.0 in one manifest)
- * num_rows **(optional)** - number of rows in uploaded file
- * md5 - MD5 checksum of uploaded file
+ * **file_url** - full path to desired file uploaded on storage
+ * **target_ads** - **OBSOLETE**
+ * **timestamp** - unix timestamp representing time when file was uploaded on storage
+ * **feed** - name of entity, to which the file is connected
+ * **feed_version** - the version in FEED file to which the uploaded file is connected ( **only one version of entity can be present in manifest file** - you cannot have Account v1.0 and Account v2.0 in one manifest)
+ * **num_rows** **(optional)** - number of rows in uploaded file
+ * **md5** - MD5 checksum of uploaded file
 
 #### Example:
 
@@ -139,19 +139,19 @@ This section is containing information about the CSV downloader section of the c
 
 The structure of the configuration file for S3 data source looks like this:
 
- * bucket - name of the S3 bucket
- * folder - name of the folder on the data source. In this folder the manifests files need to be present. It is possible to have more tree like structure. The tool will be looking for manifest in whole path after this path.
- * data_structure_info - the full path to the FEED file
- * access_key - access key to S3 bucket
- * secret_key - secret key to S3 bucket (this parameter should be not saved in configuration.json file but provided to execution by Secure Parameter. How to do it can be found in metadata gem documentation)
- * manifest - definition of the manifest file ( more info below )
- * file_structure - this section of the configuration is dedicated to structure of the file. This hints are need for CSV parsing when loading it to ADS. More information about each of the option can be found in Vertica documentation [link](http://my.vertica.com/docs/6.1.x/HTML/index.htm#1668.htm).
-    * skip_rows (optional) - number of skipped columns in CSV (used mainly to remove header from CSV file)
-    * column_separator (optional) - the character which is separating fields in CSV
-    * escape_as (optional) - specifies the the escaping character
-    * file_format (optional) - specify format of the file. Empty is pure CSV. In case of GZIP file use GZIP option.
-    * db_parser (optional) - specify the type of parser used by ADS. Empty is default parser. In case you want to use GDC Parser use gdc option.
-    * enclosed_by (optional) - specifies the enclosing character
+ * **bucket** - name of the S3 bucket
+ * **folder** - name of the folder on the data source. In this folder the manifests files need to be present. It is possible to have more tree like structure. The tool will be looking for manifest in whole path after this path.
+ * **data_structure_info** - the full path to the FEED file
+ * **access_key** - access key to S3 bucket
+ * **secret_key** - secret key to S3 bucket (this parameter should be not saved in configuration.json file but provided to execution by Secure Parameter. How to do it can be found in metadata gem documentation)
+ * **manifest** - definition of the manifest file ( more info below )
+ * **file_structure** - this section of the configuration is dedicated to structure of the file. This hints are need for CSV parsing when loading it to ADS. More information about each of the option can be found in Vertica documentation [link](http://my.vertica.com/docs/6.1.x/HTML/index.htm#1668.htm).
+    * **skip_rows** (optional) - number of skipped columns in CSV (used mainly to remove header from CSV file)
+    * **column_separator** (optional) - the character which is separating fields in CSV
+    * **escape_as** (optional) - specifies the the escaping character
+    * **file_format** (optional) - specify format of the file. Empty is pure CSV. In case of GZIP file use GZIP option.
+    * **db_parser** (optional) - specify the type of parser used by ADS. Empty is default parser. In case you want to use GDC Parser use gdc option.
+    * **enclosed_by** (optional) - specifies the enclosing character
 
 ### Manifest option
 
