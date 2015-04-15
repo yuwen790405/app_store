@@ -135,7 +135,7 @@ The data files will contain data, which the user want to download. The downloade
 
 ## Configuration
 
-This section is containing information about the CSV downloader section of the configuration.json file.
+This section is containing information about the CSV downloader section of the configuration.json file. It is important to know, that CSV downloader is processing data in batches. One manifest file, mean one batch. If you want to set up the ADS integrator processing data downloader by CSV connector, you need to switch it to the batch mode. The name  of the batch is ID of the connector.
 
 The structure of the configuration file for S3 data source looks like this:
 
