@@ -94,14 +94,17 @@ module GoodData::Bricks
         md = project.metadata
         if md['GOODOT_CUSTOM_PROJECT_ID']
           filter_value = md['GOODOT_CUSTOM_PROJECT_ID']
-          filtered_users = new_users.select { |u| u[:pid] == filter_value }
+          filtered_users = new_users.select do |u|
+            fail "Column for determining the project assignement is empty for \"#{u[:login]}\"" if u[:pid].blank?
+            u[:pid] == filter_value
+          end
           puts "Project #{project.pid} will receive #{filtered_users.count} from #{new_users.count} users"
           project.import_users(filtered_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
         else
           fail "Project \"#{project.pid}\" metadata does not contain key GOODOT_CUSTOM_PROJECT_ID. We are unable to get the value to filter users."
         end
       else
-        domain.create_users(new_users, :ignore_failures => ignore_failures)
+        domain.create_users(new_users, ignore_failures: ignore_failures)
         project.import_users(new_users , domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
       end
 
