@@ -110,15 +110,28 @@ module GoodData
       end
     end
 
+    def self.get_missing_users(filters, options = {})
+      project = options[:project]
+      users_cache = options[:users_cache]
+      filters.reject { |u| users_cache.key?(u[:login]) }
+    end
+    
+
     def self.verify_existing_users(filters, options = {})
       project = options[:project]
 
       users_must_exist = options[:users_must_exist] == false ? false : true
-      users_cache = options[:users_cache] || create_cache(project.users, :login)
+      users_cache = options[:users_cache]
+      domain = options[:domain]
 
       if users_must_exist
-        list = users_cache.values
-        missing_users = filters.map { |x| x[:login] }.reject { |u| project.member?(u, list) }
+        missing_users = filters.reject do |u|
+          next true if users_cache.key?(u[:login])
+          domain_user = (domain && domain.find_user_by_login(u[:login]))
+          users_cache[domain_user.login] = domain_user if domain_user
+          next true if domain_user
+          false
+        end
         fail "#{missing_users.count} users are not part of the project and variable cannot be resolved since :users_must_exist is set to true (#{missing_users.join(', ')})" unless missing_users.empty?
       end
     end
@@ -409,11 +422,23 @@ module GoodData
       users_must_exist = options[:users_must_exist] == false ? false : true
       filters = normalize_filters(user_filters, project)
       domain = options[:domain]
-      users = domain ? project.users + domain.users : project.users
+      users = project.users
       # users = domain ? project.users : project.users
       users_cache = create_cache(users, :login)
-      verify_existing_users(filters, options.merge(users_must_exist: users_must_exist, users_cache: users_cache))
-      user_filters, errors = maqlify_filters(filters, options.merge(users_cache: users_cache, users_must_exist: users_must_exist))
+      missing_users = get_missing_users(filters, options.merge(users_cache: users_cache))
+      user_filters, errors = if missing_users.empty?
+        verify_existing_users(filters, project: project, users_must_exist: users_must_exist, users_cache: users_cache)
+        maqlify_filters(filters, options.merge(users_cache: users_cache, users_must_exist: users_must_exist))
+      elsif missing_users.count < 100
+        verify_existing_users(filters, project: project, users_must_exist: users_must_exist, users_cache: users_cache,  domain: domain)
+        maqlify_filters(filters, options.merge(users_cache: users_cache, users_must_exist: users_must_exist, domain: domain))
+      else
+        users = users + domain.users
+        users_cache = create_cache(users, :login)
+        verify_existing_users(filters, project: project, users_must_exist: users_must_exist, users_cache: users_cache,  domain: domain)
+        maqlify_filters(filters, options.merge(users_cache: users_cache, users_must_exist: users_must_exist, domain: domain))
+      end
+
       fail "Validation failed #{errors}" if !ignore_missing_values && !errors.empty?
 
       filters = user_filters.map { |data| client.create(klass, data, project: project) }

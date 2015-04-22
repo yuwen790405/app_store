@@ -124,7 +124,6 @@ module GoodData
       # @param dataset [Hash] Dataset blueprint hash represenation
       # @return [Hash] Manifest for a particular reference
       def self.references_to_wire(project, dataset)
-        binding.pry
         DatasetBlueprint.references(dataset).map do |r|
           if ProjectBlueprint.date_dimension?(project, r[:dataset])
             ProjectBlueprint.find_date_dimension(project, r[:dataset])[:name]

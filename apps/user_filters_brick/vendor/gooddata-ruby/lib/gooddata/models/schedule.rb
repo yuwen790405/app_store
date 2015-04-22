@@ -147,6 +147,8 @@ module GoodData
     # @return [GoodData::Schedule] New GoodData::Schedule instance
     def initialize(json)
       super
+      GoodData::Helpers.decode_params(json['schedule']['params'] || {})
+      GoodData::Helpers.decode_params(json['schedule']['hiddenParams'] || {})
       @json = json
     end
 

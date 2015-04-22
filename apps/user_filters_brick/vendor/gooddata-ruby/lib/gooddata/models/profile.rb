@@ -330,6 +330,12 @@ module GoodData
       @json['accountSetting']['ssoProvider']
     end
 
+    def sso_provider=(an_sso_provider)
+      @dirty = true
+      @json['accountSetting']['ssoProvider'] = an_sso_provider
+    end
+    
+
     # Gets the preferred timezone
     #
     # @return [String] Preferred timezone
