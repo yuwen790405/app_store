@@ -50,9 +50,11 @@ module GoodData
               # And following lines are even much more ugly hack
               # 'authentication_modes' => ['sso', 'password']
             },
+            'links' => {},
             'meta' => {}
           }
         }
+        json['user']['links']['self'] = data[:uri] if data[:uri]
         c.create(self, json)
       end
 
@@ -386,7 +388,7 @@ module GoodData
         [:phoneNumber, :phone_number],
         [:firstname, :first_name],
         [:lastname, :last_name],
-        [:authenticationModes, :authentication_modes]
+        [:authenticationModes, :authentication_modes],
       ].each do |vals|
         wire, rb = vals
         tmp[rb] = tmp[wire]

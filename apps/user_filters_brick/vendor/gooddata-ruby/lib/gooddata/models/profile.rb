@@ -73,14 +73,19 @@ module GoodData
       # @param attributes [Hash] Hash with initial attributes
       # @return [GoodData::Profile] New profile instance
       def create(attributes)
-        json = EMPTY_OBJECT.dup
+        res = create_object(attributes)
+        res.save!
+        res
+      end
+
+      def create_object(attributes)
+        json = EMPTY_OBJECT.deep_dup
+        json['accountSetting']['links']['self'] = attributes[:uri] if attributes[:uri]
         res = client.create(GoodData::Profile, json)
 
         attributes.each do |k, v|
           res.send("#{k}=", v) if ASSIGNABLE_MEMBERS.include? k
         end
-
-        res.save!
         res
       end
 
@@ -318,6 +323,11 @@ module GoodData
           @dirty = false
         end
       end
+      self
+    end
+
+    def sso_provider
+      @json['accountSetting']['ssoProvider']
     end
 
     # Gets the preferred timezone
@@ -347,7 +357,6 @@ module GoodData
     # @return [String] Resource URI
     def uri
       GoodData::Helpers.get_path(@json, %w(accountSetting links self))
-      # @json['accountSetting']['links']['self']
     end
 
     def data
@@ -375,7 +384,8 @@ module GoodData
         [:phoneNumber, :phone],
         [:firstName, :first_name],
         [:lastName, :last_name],
-        [:authenticationModes, :authentication_modes]
+        [:authenticationModes, :authentication_modes],
+        [:ssoProvider, :sso_provider]
       ].each do |vals|
         wire, rb = vals
         tmp[rb] = tmp[wire]

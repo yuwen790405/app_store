@@ -151,6 +151,10 @@ module GoodData
         GoodData::Domain[domain_name, :client => self]
       end
 
+      def project_is_accessible?(id)
+        projects(id) && true rescue false
+      end
+
       def projects(id = :all)
         GoodData::Project[id, client: self]
       end
@@ -224,7 +228,7 @@ module GoodData
         @connection.get uri, opts, & block
       end
 
-      def get_project_webdav_path(opts = { :project => GoodData.project })
+      def project_webdav_path(opts = { :project => GoodData.project })
         p = opts[:project]
         fail ArgumentError, 'No :project specified' if p.nil?
 
@@ -235,7 +239,7 @@ module GoodData
         URI.join(u.to_s.chomp(u.path.to_s), '/project-uploads/', "#{project.pid}/")
       end
 
-      def get_user_webdav_path(opts = { :project => GoodData.project })
+      def user_webdav_path(opts = { :project => GoodData.project })
         p = opts[:project]
         fail ArgumentError, 'No :project specified' if p.nil?
 

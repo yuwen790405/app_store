@@ -1,7 +1,7 @@
 PATH
   remote: vendor/gooddata-ruby
   specs:
-    gooddata (0.6.14)
+    gooddata (0.6.16)
       activesupport (~> 4.1, >= 4.1.0)
       aws-sdk (~> 1.45)
       bundler (~> 1.7, >= 1.7.3)
@@ -37,7 +37,7 @@ GEM
       nokogiri (>= 1.4.4)
     coderay (1.1.0)
     docile (1.1.5)
-    domain_name (0.5.23)
+    domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
     erubis (2.7.0)
     faraday (0.9.1)
@@ -60,7 +60,7 @@ GEM
     json_pure (1.8.2)
     method_source (0.8.2)
     mime-types (2.4.3)
-    minitest (5.5.1)
+    minitest (5.6.0)
     multi_json (1.11.0)
     multipart-post (2.0.0)
     netrc (0.10.3)

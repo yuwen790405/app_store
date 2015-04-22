@@ -85,6 +85,7 @@ This is how the file looks like
 This is how you have to set up your process
 
     {
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/7fdd8453c3c811ccc5a9/raw/155f6fd8414135e16994f30c2d6b16356872001c/gistfile1.txt" }
       "domain": "my_domain",
       "filters_setup": {
         "user_column": "login",
@@ -95,7 +96,7 @@ This is how you have to set up your process
 Notes:
 
 1) You can also use numbers to specify the "user_column" or "column" to be used in case you do not have headers.
-2) If your file does not have a header you have to explicitly specify it using `csv_headers` parameter.
+2) If your file does not have a header you have to explicitly specify it using `"csv_headers": false` parameter.
 
 ### Data permissions through value enumeration with row based file
 
@@ -112,12 +113,16 @@ This is how the file looks like
 This is how you have to set up your process
 
     {
-      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/7fdd8453c3c811ccc5a9/raw/155f6fd8414135e16994f30c2d6b16356872001c/gistfile1.txt" },
+      "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/e369f17358f12d809607/raw/c2a0a2ee7a87e5318dd510b2aa3f93511f9ab7b4/gistfile1.txt" },
+      "domain": "my_domain",
       "filters_setup": {
-        "user_column": 0,
         "labels": [{"label": "label.devs.dev_id.email"}]
       }
     }
+
+Notes:
+1) Login is expected to be the first column
+2) File is expected not to have a header. Parameter `"csv_headers"` is ignored in this case.
 
 ### Support for over-to filters
 Over to filters are useful in cases where there are so many individual values that need to be set up for each users that it is no longer practical to have them all in the filter. Rule of thumb is when number of values per user hits high hundreds. You can set up a dataset which contains all the values and you can set up the filter to look in that particular dataset for values. The upside of this solution is that it can handle more values and also simplifies the filters. The drawback with this is that you have to put additional datasets in the model which complicate the model.

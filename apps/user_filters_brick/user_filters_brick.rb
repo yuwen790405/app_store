@@ -22,7 +22,7 @@ module GoodData::Bricks
       symbolized_config[:labels].each { |l| l.symbolize_keys! }
       headers_in_options = params['csv_headers'] == 'false' || true
 
-      mode = params['mode'] || 'sync_project'
+      mode = params['sync_mode'] || 'sync_project'
       filters = []
 
       csv_with_headers = if GoodData::UserFilterBuilder.row_based?(symbolized_config)
@@ -31,6 +31,7 @@ module GoodData::Bricks
         headers_in_options
       end
 
+      puts "Synchronizing in mode \"#{mode}\""
       case mode
       when 'sync_project'
         CSV.foreach(File.open(data_source.realize(params), 'r:UTF-8'), headers: csv_with_headers, return_headers: false, encoding: 'utf-8') do |row|
@@ -52,6 +53,7 @@ module GoodData::Bricks
         end
       end
       filters_to_load = GoodData::UserFilterBuilder::get_filters(filters, symbolized_config)
+      puts "Synchronizing #{filters_to_load.count} filters"
       project.add_data_permissions(filters_to_load, restrict_if_missing_all_values: true, domain: domain, dry_run: false)
     end
   end
