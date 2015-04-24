@@ -146,6 +146,7 @@ The structure of the configuration file for S3 data source looks like this:
  * **secret_key** - secret key to S3 bucket (this parameter should be not saved in configuration.json file but provided to execution by Secure Parameter. How to do it can be found in metadata gem documentation)
  * **manifest** - definition of the manifest file ( more info below )
  * **manifest_process_type** (move/history) - if set to move, the manifest file will be moved to processed folder. If set to history, the manifest will stay.
+ * **number_of_manifest_in_one_run** - maximum number of manifests which is processed in one run. Default value is 5
  * **delete_data_after_processing** (true/false) - if set to TRUE, the data will be delete from the source, after processing. Default FALSE.
  * **file_structure** - this section of the configuration is dedicated to structure of the file. This hints are need for CSV parsing when loading it to ADS. More information about each of the option can be found in Vertica documentation [link](http://my.vertica.com/docs/6.1.x/HTML/index.htm#1668.htm).
     * **skip_rows** (optional) - number of skipped columns in CSV (used mainly to remove header from CSV file)
