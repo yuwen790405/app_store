@@ -13,7 +13,9 @@ module GoodData::Bricks
       integration_mode = ads_wrapper.get_mode
       if (integration_mode == :entity)
         entities = metadata.get_integrator_entities_ids
+
         entities.each do |entity_name|
+          puts "processing entity #{entity_name}"
           ads_wrapper.load_entity(entity_name)
         end
       elsif (integration_mode == :batch)
