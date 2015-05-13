@@ -49,6 +49,7 @@ include GoodData::Bricks
 stack = [
   LoggerMiddleware,
   BenchMiddleware,
+  GoodDataMiddleware,
   GoodData::Connectors::Metadata::MetadataMiddleware,
   GoodData::Connectors::DownloaderCsv::CsvDownloaderMiddleWare,
   ExecuteBrick

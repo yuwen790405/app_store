@@ -22,9 +22,17 @@ module GoodData::Bricks
         if (!previous_batch.nil?)
           downloader.prepare_next_load(previous_batch)
         else
+          trigger_event_manifest_missing if i == 0
           break
         end
       end
     end
+
+
+    def trigger_event_manifest_missing()
+      process = GoodData::Process[$SCRIPT_PARAMS["PROCESS_ID"]]
+      process.trigger_event("manifestMissing")
+    end
+
   end
 end
