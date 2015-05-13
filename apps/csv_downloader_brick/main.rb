@@ -45,11 +45,13 @@ require_relative 'execute_brick'
 
 include GoodData::Bricks
 
+#GoodData.logging_on
+
 # Prepare stack
 stack = [
   LoggerMiddleware,
   BenchMiddleware,
-  GoodDataMiddleware,
+  GoodDataCustomMiddleware,
   GoodData::Connectors::Metadata::MetadataMiddleware,
   GoodData::Connectors::DownloaderCsv::CsvDownloaderMiddleWare,
   ExecuteBrick
