@@ -47,7 +47,6 @@ describe GoodData::Bricks::UsersBrick do
         end
       end
 
-      binding.pry
       @project_1.upload_file(tempfile.path)
 
       user_process = @project_1.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
