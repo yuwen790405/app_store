@@ -21,12 +21,23 @@ While deployment is tool agnostic. Scheduling has to be performed using Automati
 You can read about various ways how to schedule processes in our [cookbook](https://github.com/gooddata/gooddata-ruby-examples/tree/master/07_deployment_recipes)
 
 ### Input data sources
-As stated before we are trying to minimize the amount of glue code that is necessary to make things work. Since generally you do not know where your data would come from we want to give you power to consume wider number of sources so you do not have to change any code just configuration. What is considered a source you can recognize by the name of the parameter in the documentation of specific brick. The name of the parameter will be "*_input_source" or just "input_source". If it is named according to this convention then you can treat is as a datasource.
+As stated before we are trying to minimize the amount of glue code that is necessary to make things work. Since generally you do not know where your data would come from we want to give you power to consume wider number of sources (web, ADS, staging (aka WebDAV)) so you do not have to change any code just configuration. What is considered a source you can recognize by the name of the parameter in the documentation of specific brick. The name of the parameter will be "*_input_source" or just "input_source". If it is named according to this convention then you can treat is as a datasource.
 
 #### Staging
 Staging is an ephemeral storage that is part of gooddata platform. It supports couple of protocols most useful of which is WebDAV so sometimes it is internally referred to as WebDAV. You can specify a data source to consume a file from staging like this.
 
 The file is consumed as is. Majority of the bricks are expecting CSV that is parsed using a [csv](http://ruby-doc.org/stdlib-1.9.2/libdoc/csv/rdoc/CSV.html) library.
+
+    "input_source": {
+  	  "type": "staging",
+  	  "path": "filename"
+  	}
+
+Since staging is most common there is also a shorthand
+
+  "input_source": "folder/filename/"
+
+Which is equivalent to the previous. Filename is expected to be relative to the root of the project specific staging (ie relative to the "https://secure-di.gooddata.com/project-uploads/{PROJECT_ID}/"). Please note that there is not slash as the first character.
 
 #### Agile data service (ADS)
 ADS is a database service. You can specify a query to ADS as a data source.

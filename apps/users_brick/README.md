@@ -87,7 +87,7 @@ The process takes a data source synchronizes the organization. That is it.
 
   	{
   	  "sync_mode": "add_to_organization",
-  	  "domain": "organization_name",
+  	  "organization": "organization_name",
       "data_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" }
     }
 
@@ -99,7 +99,7 @@ The process takes a data source and synchronizes the project. That is it. The us
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
       "sync_mode": "sync_project",
-      "domain": "gooddata-tomas-svarovsky",
+      "organization": "gooddata-tomas-svarovsky",
       "whitelists" : ["svarovsky+gem_tester@gooddata.com"]
     }
 
@@ -119,7 +119,7 @@ This mode is meant for cases where a person is by hand managing small number of 
 
 	  {
 	    "sync_mode": "sync_multiple_projects_based_on_pid",
-	    "domain": "organization_name",
+	    "organization": "organization_name",
       "data_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
       "whitelists" : ["etl_admin@gooddata.com"]
     }
@@ -135,7 +135,7 @@ The benefit here is that the process is deployed in each project so you have eve
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/4005f6d99e9a8c6a9c90/raw/63d2e58dabea89cc2953a690adb5d74b492a184f/domain_users.csv" },
       "sync_mode": "sync_one_project_based_on_pid",
-      "domain": "gooddata-tomas-svarovsky",
+      "organization": "gooddata-tomas-svarovsky",
       "multiple_projects_column", "project_id"
       "whitelists" : ["etl_admin@gooddata.com"]
     }
@@ -147,7 +147,7 @@ What customer can do is to generate an ID that for him internally identifies a p
 
 ![](https://www.dropbox.com/s/ybgsch8lf810xqm/project_sync_mode_one_to_many_pbg_custom_id.png?dl=0&raw=1)
 
-Notice there are three distinct groups of processes (differentiated) by the color. The advantage that these things do not have to be synchronized and can run at their pace. Let's walk trhough the steps.
+Notice there are three distinct groups of processes (differentiated) by the color. The advantage that these things do not have to be synchronized and can run at their pace. Let's walk through the steps.
 
 * Red - Customer loads the data and at some point they are picked up and put into storage. His data contains the Custom Id that would allow us to piece things together without knowing in which physical project they would end up.
 * Yellow - at some point the process responsible for maintaining projects and deploying them wakes up. He notices there is need for spinning up a new project (Project 4) so he does that. Part of his responsibilities is to deploy an ETL process and mark the deployed project with 'Custom project Id'.

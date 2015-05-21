@@ -1,5 +1,6 @@
 require 'gooddata'
-$LOAD_PATH.unshift(File.expand_path('../../../..', __FILE__))
+APP_STORE_ROOT = File.expand_path('../../../..', __FILE__)
+$LOAD_PATH.unshift(APP_STORE_ROOT)
 require './apps/users_brick/users_brick'
 
 include GoodData::Bricks
@@ -14,9 +15,13 @@ end
 describe GoodData::Bricks::UsersBrick do
 
   before(:all) do
-    @client = GoodData.connect('svarovsky+gem_tester@gooddata.com', '')
-    @project_1 = @client.create_project(title: 'Project app_store testing 1', auth_token: '')
-    @project_2 = @client.create_project(title: 'Project app_store testing 2', auth_token: '')
+    logger = Logger.new(STDOUT)
+    logger.level = Logger::DEBUG
+    GoodData.logger = logger
+    @client = GoodData.connect('svarovsky+gem_tester@gooddata.com', ENV['GDC_PASSWORD'])
+
+    @project_1 = @client.create_project(title: 'Project app_store testing 1', auth_token: ENV['GDC_TOKEN'])
+    @project_2 = @client.create_project(title: 'Project app_store testing 2', auth_token: ENV['GDC_TOKEN'])
     @domain = @client.domain('gooddata-tomas-svarovsky')
   end
 
@@ -25,8 +30,8 @@ describe GoodData::Bricks::UsersBrick do
   end
 
   after(:all) do
-    @project_1 && @project_1.delete
-    @project_2 && @project_2.delete
+    # @project_1 && @project_1.delete
+    # @project_2 && @project_2.delete
   end
 
   it 'should add users to project from damain' do
@@ -42,12 +47,15 @@ describe GoodData::Bricks::UsersBrick do
         end
       end
 
-      UsersBrick.new.call(
-        'GDC_GD_CLIENT' => @client,
-        'gdc_project' => @project_1.pid,
-        'domain' => @domain.name,
-        'csv_path' => tempfile.path
-      )
+      binding.pry
+      @project_1.upload_file(tempfile.path)
+
+      user_process = @project_1.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+      user_process.execute('main.rb', params: {
+        'domain'        => @domain.name,
+        'input_source'  => Pathname(tempfile.path).basename.to_s,
+        'sync_mode'     => 'sync_project'
+      })
     ensure
       tempfile.unlink
     end
@@ -66,13 +74,14 @@ describe GoodData::Bricks::UsersBrick do
         csv << [:login]
         csv << [user_name]
       end
-      UsersBrick.new.call(
-        'GDC_GD_CLIENT'       => @client,
-        'gdc_project'         => @project_1.pid,
-        'domain'              => @domain.name,
-        'csv_path'            => tempfile.path,
-        'sync_mode'           => 'add_only_to_domain'
-      )
+
+      @project_1.upload_file(tempfile.path)
+      user_process = @project_1.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+      user_process.execute('main.rb', params: {
+        'domain'        => @domain.name,
+        'input_source'  => Pathname(tempfile.path).basename.to_s,
+        'sync_mode'     => 'add_to_organization'
+      })
     ensure
       tempfile.unlink
     end
@@ -84,10 +93,10 @@ describe GoodData::Bricks::UsersBrick do
     users = @domain.users.sample(10)
     headers = [:pid, :first_name, :last_name, :login, :password, :email, :role, :sso_provider]
     projects = [@project_1, @project_2]
-    users_data = users.map { |u| u.to_hash.merge(pid: projects.sample.pid, role: 'admin') }
+    users_data = users.map { |u| u.to_hash.merge(pid: projects.sample.pid, role: ['admin', 'editor'].sample) }
     
     begin
-      tempfile = Tempfile.new('multiproject_sync')
+      tempfile = Tempfile.new('sync_multiple_projects_based_on_pid')
       CSV.open(tempfile.path, 'w') do |csv|
         csv << headers
         users_data.each do |u|
@@ -95,14 +104,49 @@ describe GoodData::Bricks::UsersBrick do
         end
       end
 
-      UsersBrick.new.call(
-        'GDC_GD_CLIENT' => @client,
-        'gdc_project' => @project_1.pid,
-        'domain' => @domain.name,
-        'csv_path' => tempfile.path,
+      @project_2.upload_file(tempfile.path)
+      user_process = @project_2.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+      user_process.execute('main.rb', params: {
+        'domain'        => @domain.name,
+        'input_source'  => Pathname(tempfile.path).basename.to_s,
+        'sync_mode'     => 'sync_multiple_projects_based_on_pid',
         'multiple_projects_column' => 'pid',
-        'sync_mode' => 'sync_multiple_projects_based_on_pid'
-      )
+      })
+
+      test_data = users_data.group_by { |u| u[:pid] }.map { |pid, u| [pid, u.count] }
+      test_data.each do |pid, count|
+        expect(@client.projects(pid).users.count).to eq (count + 1)
+      end
+    ensure
+      tempfile.unlink
+    end
+  end
+
+  it 'should be able to add users to multiple projects through per project ETL' do
+    users = @domain.users.sample(10)
+    headers = [:pid, :first_name, :last_name, :login, :password, :email, :role, :sso_provider]
+    projects = [@project_1, @project_2]
+    users_data = users.map { |u| u.to_hash.merge(pid: projects.sample.pid, role: ['admin', 'editor'].sample) }
+    
+    begin
+      tempfile = Tempfile.new('sync_on_with_pid')
+      CSV.open(tempfile.path, 'w') do |csv|
+        csv << headers
+        users_data.each do |u|
+          csv << u.values_at(*headers)
+        end
+      end
+
+      projects.peach do |project|
+        project.upload_file(tempfile.path)
+        user_process = project.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+        user_process.execute('main.rb', params: {
+          'domain'        => @domain.name,
+          'input_source'  => Pathname(tempfile.path).basename.to_s,
+          'sync_mode'     => 'sync_multiple_projects_based_on_pid',
+          'multiple_projects_column' => 'pid',
+        })
+      end      
 
       test_data = users_data.group_by { |u| u[:pid] }.map { |pid, u| [pid, u.count] }
       test_data.each do |pid, count|
