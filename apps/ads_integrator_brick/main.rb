@@ -7,7 +7,7 @@ fetch_gems = true
 repo_gems = [
   'https://github.com/gooddata/gooddata_connectors_base/archive/s3.zip',
   'https://github.com/gooddata/gooddata_connectors_metadata/archive/bds_implementation.zip',
-  'https://github.com/gooddata/gooddata_connectors_ads/archive/master.zip'
+  'https://github.com/gooddata/gooddata_connectors_ads/archive/v0.0.1.zip'
 ]
 
 if fetch_gems
