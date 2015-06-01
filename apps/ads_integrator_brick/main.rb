@@ -49,6 +49,7 @@ include GoodData::Bricks
 stack = [
     LoggerMiddleware,
     BenchMiddleware,
+    GoodDataCustomMiddleware,
     GoodData::Connectors::Metadata::MetadataMiddleware,
     GoodData::Connectors::Ads::AdsMiddleware,
     ExecuteBrick

@@ -24,6 +24,39 @@ module GoodData::Bricks
       else
         fail "Unknown integration mode"
       end
+      # Set notification metadata key to TRUE in case that work was done by ADS integrator
+      if (params.include?("NOTIFICATION_METADATA") and ads_wrapper.work_done?)
+        logger.info "Setting #{params["NOTIFICATION_METADATA"]} to true"
+        GoodData.project.set_metadata(params["NOTIFICATION_METADATA"],true)
+      end
     end
   end
+
+  class GoodDataCustomMiddleware < GoodData::Bricks::Middleware
+    def call(params)
+      logger = params['GDC_LOGGER']
+      token_name = 'GDC_SST'
+      protocol_name = 'CLIENT_GDC_PROTOCOL'
+      server_name = 'CLIENT_GDC_HOSTNAME'
+      project_id = params['GDC_PROJECT_ID']
+
+      server = if params[protocol_name] && params[server_name]
+                 "#{params[protocol_name]}://#{params[server_name]}"
+               end
+
+      client = if params['GDC_USERNAME'].nil? || params['GDC_PASSWORD'].nil?
+                 puts "Connecting with SST to server #{server}"
+                 fail 'SST (SuperSecureToken) not present in params' if params[token_name].nil?
+                 GoodData.connect(sst_token: params[token_name], server: server)
+               else
+                 puts "Connecting as #{params['GDC_USERNAME']} to server #{server}"
+                 GoodData.connect(params['GDC_USERNAME'], params['GDC_PASSWORD'], server: server)
+               end
+      project = client.projects(project_id)
+      GoodData.project = project
+      GoodData.logger = logger
+      @app.call(params.merge!('GDC_GD_CLIENT' => client, 'gdc_project' => project))
+    end
+  end
+
 end
