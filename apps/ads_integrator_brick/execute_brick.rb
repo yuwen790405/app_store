@@ -27,7 +27,7 @@ module GoodData::Bricks
       # Set notification metadata key to TRUE in case that work was done by ADS integrator
       if (params.include?("NOTIFICATION_METADATA") and ads_wrapper.work_done?)
         logger.info "Setting #{params["NOTIFICATION_METADATA"]} to true"
-        GoodData.project.set_metadata(params["NOTIFICATION_METADATA"],true)
+        GoodData.project.set_metadata(params["NOTIFICATION_METADATA"],"true")
       end
     end
   end
