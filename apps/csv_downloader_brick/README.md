@@ -124,11 +124,11 @@ The structure of the file should look like this:
 
 #### Example:
 
-    file_url|target_ads|timestamp|feed|feed_version|num_rows|md5
-    s3://bucket/folder/account.20111231235959.txt.gz||1325404799|Account|1.0|2|87c6054999cf18ba69568993357e09f9
-    s3://bucket/folder/user.20111231235959.txt.gz||1325404799|User|1.0|1|8a4c647cd56e77cb37cf0a5566157dc9
-    s3://bucket/folder/facts.1.20111231235959.txt.gz||1325404799|Facts|1.2|15444|5d0a290ca7fc8d4dc7dd9cdd0dd15f96
-    s3://bucket/folder/facts.2.20111231235959.txt.gz||1325404799|Facts|1.2|52755|ba63d9912e49fa4f4b2e0797d3fcfa41
+    file_url|target_ads|timestamp|feed|feed_version|num_rows|md5|export_type
+    s3://bucket/folder/account.20111231235959.txt.gz||1325404799|Account|1.0|2|87c6054999cf18ba69568993357e09f9|full
+    s3://bucket/folder/user.20111231235959.txt.gz||1325404799|User|1.0|1|8a4c647cd56e77cb37cf0a5566157dc9|full
+    s3://bucket/folder/facts.1.20111231235959.txt.gz||1325404799|Facts|1.2|15444|5d0a290ca7fc8d4dc7dd9cdd0dd15f96|inc
+    s3://bucket/folder/facts.2.20111231235959.txt.gz||1325404799|Facts|1.2|52755|ba63d9912e49fa4f4b2e0797d3fcfa41|inc
 
 ### Data files
 
