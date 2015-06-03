@@ -120,6 +120,7 @@ The structure of the file should look like this:
  * **feed_version** - the version in FEED file to which the uploaded file is connected ( **only one version of entity can be present in manifest file** - you cannot have Account v1.0 and Account v2.0 in one manifest)
  * **num_rows** **(optional)** - number of rows in uploaded file
  * **md5** - MD5 checksum of uploaded file
+ * **export_type** **(optional)** - possible values (inc/full). Default is inc. It marks if the file in manifest is full or increment. It changes how the file is integrated to database.
 
 #### Example:
 
