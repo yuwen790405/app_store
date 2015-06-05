@@ -13,7 +13,7 @@ The deployment on Ruby Executor infrastructure can be done manually or by the Go
 
 ### Manual deployment
 
-1. Pack the app store folder apps/sql_downloader_brick. The zip should contain only files, not the directory itself.
+1. Pack the app store folder apps/csv_downloader_brick. The zip should contain only files, not the directory itself.
 2. Deploy the ZIP on the gooddata platform by Data Admin Console [link] (https://secure.gooddata.com/admin/disc/)
 3. Create the schedule and put mandatory configuration options to schedule parameters. Mandatory parameters are specified in info.json file.
 4. Run the schedule
