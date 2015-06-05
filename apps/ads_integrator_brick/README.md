@@ -122,9 +122,9 @@ In next example we have entity Account. This entity will have field ID in the HU
 
 There are few types of objects created in ADS after the execution of ADS integrator. The user should always use the VIEWs to access data.
 
- * Source tables - The name of the table can look like this: src_{source}_{entity_name}_dv. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. (src_csv_Opportunity_dv)
- * Stage tables - The name of the tables can look like this: stg_{source}_{entity_name}_{dv_type}. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. The dv_type is type of the Data Vault table (hub,scd1,scd2). (stg_csv_Opportunity_hub)
- * Views - The name of the view can look like this: ls_{entity_name}. The ADS integrator will create views for user. This view will give user access to data without knowledge about the integration process. (ls_Opportunity)
+ * **Source tables** - The name of the table can look like this: src_{source}_{entity_name}_dv. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. (src_csv_Opportunity_dv)
+ * **Stage tables** - The name of the tables can look like this: stg_{source}_{entity_name}_{dv_type}. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. The dv_type is type of the Data Vault table (hub,scd1,scd2). (stg_csv_Opportunity_hub)
+ * **Views** - The name of the view can look like this: ls_{entity_name}. The ADS integrator will create views for user. This view will give user access to data without knowledge about the integration process. (ls_Opportunity)
 
 ### Merge approach
 
@@ -157,9 +157,9 @@ In next example we have entity Account. This entity will have field ID used as p
 
 There are few types of objects created in ADS after the execution of ADS integrator. The user should always use the VIEWs to access data.
 
- * Source tables - The name of the table can look like this: src_{source}_{entity_name}_merge. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. (src_csv_Opportunity_merge)
- * Stage tables - The name of the tables can look like this: stg_{source}_{entity_name}_merge. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. The dv_type is type of the Data Vault table (hub,scd1,scd2). (stg_csv_Opportunity_merge)
- * Views - The name of the view can look like this: ls_{entity_name}. The ADS integrator will create views for user. This view will give user access to data without knowledge about the integration process. (ls_Opportunity)
+ * **Source tables** - The name of the table can look like this: src_{source}_{entity_name}_merge. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. (src_csv_Opportunity_merge)
+ * **Stage tables** - The name of the tables can look like this: stg_{source}_{entity_name}_merge. The source is shortcut of downloader, which downloaded the entity. The entity name is name of the entity. The dv_type is type of the Data Vault table (hub,scd1,scd2). (stg_csv_Opportunity_merge)
+ * **Views** - The name of the view can look like this: ls_{entity_name}. The ADS integrator will create views for user. This view will give user access to data without knowledge about the integration process. (ls_Opportunity)
 
 ## Global integration settings
 
@@ -175,7 +175,7 @@ There are few types of objects created in ADS after the execution of ADS integra
 
 ### Example
 
-    "ads_storage_prod": {
+    "ads_storage": {
         "instance_id": "instance_id",
         "username": "my_user_at@gooddata.com",
         "password": "password",
