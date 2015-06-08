@@ -11,3 +11,4 @@ gem "timecop"
 gem "restforce"
 gem "pry"
 gem "rake"
+gem 'rspec'

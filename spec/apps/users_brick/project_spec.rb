@@ -88,6 +88,34 @@ describe GoodData::Bricks::UsersBrick do
     expect(@project_1.member?(user_name)).to be_falsey
   end
 
+  it 'should be able to add users to domain AND project' do
+    domain = @client.domain('gooddata-tomas-svarovsky')
+    unused_user_name = find_unused_domain_name(@domain)
+    used_user = domain.users.sample
+    begin
+      tempfile = Tempfile.new('domain_sync')
+      CSV.open(tempfile.path, 'w') do |csv|
+        csv << [:login, :role]
+        csv << [unused_user_name, :admin]
+        csv << [used_user.login, :editor]
+      end
+
+      @project_1.upload_file(tempfile.path)
+      user_process = @project_1.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+      user_process.execute('main.rb', params: {
+        'domain'        => @domain.name,
+        'input_source'  => Pathname(tempfile.path).basename.to_s,
+        'sync_mode'     => 'sync_domain_and_project'
+      })
+    ensure
+      tempfile.unlink
+    end
+    expect(@domain.member?(used_user)).to be_truthy
+    expect(@domain.member?(unused_user_name)).to be_truthy
+    expect(@project_1.member?(used_user)).to be_truthy
+    expect(@project_1.member?(unused_user_name)).to be_truthy
+  end
+
   it 'should be able to add users to multiple projects' do
     users = @domain.users.sample(10)
     headers = [:pid, :first_name, :last_name, :login, :password, :email, :role, :sso_provider]
