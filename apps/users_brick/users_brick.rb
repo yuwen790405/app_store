@@ -26,7 +26,7 @@ module GoodData
           fail "The parameter \"sync_mode\" has to have one of the values #{MODES.map(&:to_s).join(', ')} or has to be empty."
         end
 
-        whitelists = params['whitelists'] || [client.user.login]
+        whitelists = Set.new(params['whitelists'] || []) + Set.new((params['regexp_whitelists'] || []).map {|r| /#{r}/}) + Set.new([client.user.login])
         multiple_projects_column = params['multiple_projects_column']
 
         # Check mandatory columns and parameters
