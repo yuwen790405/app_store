@@ -84,8 +84,15 @@ module GoodData
                     project.import_users(new_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
                   when 'sync_multiple_projects_based_on_pid'
                     new_users.group_by { |u| u[:pid] }.flat_map do |project_id, users|
-                      project = client.projects(project_id)
-                      project.import_users(users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+                      begin
+                        project = client.projects(project_id)
+                        fail "You (user executing the script - #{client.user.login}) are not admin in project \"#{project_id}\"." unless project.am_i_admin?
+                        project.import_users(users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
+                      rescue RestClient::ResourceNotFound
+                        fail "Project \"#{project_id}\" was not found. Please check your project ids in the source file"
+                      rescue RestClient::Gone
+                        fail "Seems like you (user executing the script - #{client.user.login}) do not have access to project \"#{project_id}\""
+                      end
                     end
                   when 'sync_one_project_based_on_pid'
                     filtered_users = new_users.select { |u| u[:pid] == project.pid }
@@ -107,7 +114,6 @@ module GoodData
                     domain.create_users(new_users, ignore_failures: ignore_failures)
                     project.import_users(new_users, domain: domain, whitelists: whitelists, ignore_failures: ignore_failures)
                   end
-
 
         counts = results.group_by { |r| r[:type] }.map { |g, r| [g, r.count] }
         counts.each do |category, count|
