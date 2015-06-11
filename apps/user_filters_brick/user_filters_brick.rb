@@ -17,6 +17,7 @@ module GoodData::Bricks
       data_source = GoodData::Helpers::DataSource.new(params['input_source'])
 
       config = params['filters_config']
+      fail 'User filters brick requires configuration how the filter should be setup. For this use the param "filters_config"' if config.blank?
       symbolized_config = config.deep_dup
       symbolized_config.symbolize_keys!
       symbolized_config[:labels].each { |l| l.symbolize_keys! }
