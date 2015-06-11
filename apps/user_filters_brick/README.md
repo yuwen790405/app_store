@@ -87,7 +87,7 @@ This is how you have to set up your process
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/7fdd8453c3c811ccc5a9/raw/155f6fd8414135e16994f30c2d6b16356872001c/gistfile1.txt" }
       "domain": "my_domain",
-      "filters_setup": {
+      "filters_config": {
         "user_column": "login",
         "labels": [{"label": "label.devs.dev_id.email", "column": "email"}]
       }
@@ -115,7 +115,7 @@ This is how you have to set up your process
     {
       "input_source": { "type": "web", "url": "https://gist.githubusercontent.com/fluke777/e369f17358f12d809607/raw/c2a0a2ee7a87e5318dd510b2aa3f93511f9ab7b4/gistfile1.txt" },
       "domain": "my_domain",
-      "filters_setup": {
+      "filters_config": {
         "labels": [{"label": "label.devs.dev_id.email"}]
       }
     }
