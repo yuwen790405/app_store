@@ -49,10 +49,10 @@ module GoodData::Bricks
         puts "Synchronizing #{filters_to_load.count} filters"
         project.add_data_permissions(filters_to_load, restrict_if_missing_all_values: true, domain: domain, dry_run: false)
       when 'sync_multiple_projects_based_on_pid'
-        rows = CSV.foreach(File.open(data_source.realize(params), 'r:UTF-8'), headers: csv_with_headers, return_headers: false, encoding: 'utf-8') do |row|
+        CSV.foreach(File.open(data_source.realize(params), 'r:UTF-8'), headers: csv_with_headers, return_headers: false, encoding: 'utf-8') do |row|
           filters << row.to_hash
         end
-        rows.group_by { |u| u['pid'] }.flat_map do |project_id, new_filters|
+        filters.group_by { |u| u['pid'] }.flat_map do |project_id, new_filters|
           project = client.projects(project_id)
           filters_to_load = GoodData::UserFilterBuilder::get_filters(new_filters, symbolized_config)
           puts "Synchronizing #{filters_to_load.count} filters in project #{project.pid}"
