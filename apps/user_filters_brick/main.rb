@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'bundler/cli'
-Bundler::CLI.new.invoke(:install, [], path: 'gems', verbose: true)
+Bundler::CLI.new.invoke(:install, [], path: 'gems', verbose: true, :retry => 3, :jobs => 4)
 require 'bundler/setup'
 require 'gooddata'
 
