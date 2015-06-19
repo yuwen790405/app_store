@@ -84,7 +84,7 @@ module GoodData
       attr_reader :user
 
       def initialize(opts)
-        @stats = {}
+        @stats = ThreadSafe::Hash.new
         @opts = opts
 
         @headers = DEFAULT_HEADERS.dup
