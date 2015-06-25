@@ -5,9 +5,9 @@ require 'fileutils'
 fetch_gems = true
 
 repo_gems = [
-  'https://github.com/gooddata/gooddata_connectors_base/archive/s3.zip',
-  'https://github.com/gooddata/gooddata_connectors_metadata/archive/bds_implementation_devel.zip',
-  'https://github.com/gooddata/gooddata_connectors_ads/archive/by_reference_architecture.zip'
+  'https://gdc-ms-ruby-packages.s3.amazonaws.com/gooddata_connectors_base/s3.zip',
+  'https://gdc-ms-ruby-packages.s3.amazonaws.com/gooddata_connectors_metadata/bds_implementation_devel.zip',
+  'https://gdc-ms-ruby-packages.s3.amazonaws.com/gooddata_connectors_ads/by_reference_architecture.zip'
 ]
 
 if fetch_gems
