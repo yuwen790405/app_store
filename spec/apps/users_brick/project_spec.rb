@@ -30,8 +30,8 @@ describe GoodData::Bricks::UsersBrick do
   end
 
   after(:all) do
-    # @project_1 && @project_1.delete
-    # @project_2 && @project_2.delete
+    @project_1 && @project_1.delete
+    @project_2 && @project_2.delete
   end
 
   it 'should be able to add users to domain' do
