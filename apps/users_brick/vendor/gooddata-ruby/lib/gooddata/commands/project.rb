@@ -13,7 +13,8 @@ module GoodData
           template = options[:template]
           token = options[:token]
           client = options[:client]
-          GoodData::Project.create(:title => title, :summary => summary, :template => template, :auth_token => token, :client => client)
+          driver = options[:driver] || 'Pg'
+          GoodData::Project.create(:title => title, :summary => summary, :template => template, :auth_token => token, :client => client, :driver => driver)
         end
 
         # Show existing project
@@ -124,7 +125,7 @@ module GoodData
                 fail ArgumentError, 'Wrong project specified' if project.nil?
 
                 puts "Use 'exit' to quit the live session. Use 'q' to jump out of displaying a large output."
-                binding.pry(:quiet => true,
+                binding.pry(:quiet => true, # rubocop:disable Lint/Debugger
                             :prompt => [proc do |_target_self, _nest_level, _pry|
                               'project_live_session: '
                             end])

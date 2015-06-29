@@ -30,8 +30,8 @@ describe GoodData::Bricks::UsersBrick do
   end
 
   after(:all) do
-    @project_1 && @project_1.delete
-    @project_2 && @project_2.delete
+    # @project_1 && @project_1.delete
+    # @project_2 && @project_2.delete
   end
 
   it 'should be able to add users to domain' do
@@ -56,6 +56,73 @@ describe GoodData::Bricks::UsersBrick do
     end
     expect(@domain.member?(user_name)).to be_truthy
     expect(@project_1.member?(user_name)).to be_falsey
+  end
+
+
+  it 'should be able to add users to domain with mode and SSO' do
+    domain = @client.domain('gooddata-tomas-svarovsky')
+    user_names = 2.times.map { |i| find_unused_domain_name(@domain) }
+    begin
+      tempfile = Tempfile.new('domain_sync')
+      CSV.open(tempfile.path, 'w') do |csv|
+        csv << [:login, :authentication_modes, :sso_provider]
+        csv << [user_names.first, 'PASSWORD, SSO', 'SALESFORCE']
+        csv << [user_names.last, 'SSO', 'SALESFORCE']
+      end
+
+      @project_1.upload_file(tempfile.path)
+      user_process = @project_1.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+      user_process.execute('main.rb', params: {
+        'domain'        => @domain.name,
+        'input_source'  => Pathname(tempfile.path).basename.to_s,
+        'sync_mode'     => 'add_to_organization'
+      })
+    ensure
+      tempfile.unlink
+    end
+    fields = [:sso_provider, :authentication_modes]
+    expect(@domain.find_user_by_login(user_names.first).to_hash.slice(*fields)).to eq ({
+      sso_provider: "salesforce.com",
+      authentication_modes: ["PASSWORD", "SSO"]
+    })
+    expect(@domain.find_user_by_login(user_names.last).to_hash.slice(*fields)).to eq ({
+      sso_provider: "salesforce.com",
+      authentication_modes: ["SSO"]
+    })
+  end
+
+  it 'should be able to add users to domain with mode and SSO' do
+    domain = @client.domain('gooddata-tomas-svarovsky')
+    user_names = 2.times.map { |i| find_unused_domain_name(@domain) }
+    begin
+      tempfile = Tempfile.new('domain_sync')
+      CSV.open(tempfile.path, 'w') do |csv|
+        csv << [:login]
+        csv << [user_names.first]
+        csv << [user_names.last]
+      end
+
+      @project_1.upload_file(tempfile.path)
+      user_process = @project_1.deploy_process(Pathname.new(APP_STORE_ROOT) + 'apps/users_brick', name: 'users_brick_example', type: :ruby)
+      user_process.execute('main.rb', params: {
+        'domain'                => @domain.name,
+        'input_source'          => Pathname(tempfile.path).basename.to_s,
+        'sync_mode'             => 'add_to_organization',
+        'sso_provider'          => 'salesforce.com',
+        'authentication_modes'  => 'PASSWORD'
+      })
+    ensure
+      tempfile.unlink
+    end
+    fields = [:sso_provider, :authentication_modes]
+    expect(@domain.find_user_by_login(user_names.first).to_hash.slice(*fields)).to eq ({
+      sso_provider: "salesforce.com",
+      authentication_modes: ["PASSWORD"]
+    })
+    expect(@domain.find_user_by_login(user_names.last).to_hash.slice(*fields)).to eq ({
+      sso_provider: "salesforce.com",
+      authentication_modes: ["PASSWORD"]
+    })
   end
 
   describe 'adding to project' do

@@ -59,7 +59,7 @@ module GoodData
           fail(ArgumentError, 'wrong type of argument. Should be either project ID or path')
         end
 
-        id = id.match(/[a-zA-Z\d]+$/)[0] if id =~ /\//
+        id = id.match(/[a-zA-Z\d]+$/)[0] if id =~ %r{/}
 
         c = client(opts)
         fail ArgumentError, 'No :client specified' if c.nil?
@@ -313,7 +313,7 @@ module GoodData
 
     # Saves object if dirty, clears dirty flag
     def save!
-      if @dirty # rubocop:disable Style/GuardClause
+      if @dirty
         raw = @json.dup
         raw['accountSetting'].delete('login')
 
@@ -324,10 +324,6 @@ module GoodData
         end
       end
       self
-    end
-
-    def sso_provider
-      @json['accountSetting']['ssoProvider']
     end
 
     # Gets the preferred timezone
@@ -375,6 +371,25 @@ module GoodData
 
     def name
       (first_name || '') + (last_name || '')
+    end
+
+    def sso_provider
+      @json['accountSetting']['ssoProvider']
+    end
+
+    def sso_provider=(an_sso_provider)
+      @dirty = true
+      @json['accountSetting']['ssoProvider'] = an_sso_provider
+    end
+
+    def authentication_modes
+      @json['accountSetting']['authenticationModes'].map { |x| x.downcase.to_sym }
+    end
+
+    def authentication_modes=(modes)
+      modes = Array(modes)
+      @dirty = true
+      @json['accountSetting']['authenticationModes'] = modes.map { |x| x.to_s.upcase }
     end
 
     def to_hash

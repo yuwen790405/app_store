@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require 'gooddata/models/domain'
+require 'gooddata/helpers/csv_helper'
 
 describe GoodData::Domain do
   before(:each) do
@@ -63,7 +64,7 @@ describe GoodData::Domain do
     end
 
     it 'Accepts pagination options - limit' do
-      users = @domain.users(limit: 10)
+      users = @domain.users(:all, limit: 10)
       expect(users).to be_instance_of(Array)
       users.each do |user|
         expect(user).to be_an_instance_of(GoodData::Profile)
@@ -97,19 +98,27 @@ describe GoodData::Domain do
     end
 
     it 'Update a user' do
-      user = @domain.users.sample
+      user = @domain.users.reject { |u| u.login == @client.user.login }.sample
       login = user.login
       name = user.first_name
+      modes = user.authentication_modes
+      possible_modes = [:sso, :password]
+
 
       user.first_name = name.reverse
+      choice = SpecHelper.random_choice(possible_modes, user.authentication_modes)
+      user.authentication_modes = choice
       @domain.create_users([user])
       changed_user = @domain.get_user(login)
       expect(changed_user.first_name).to eq name.reverse
+      expect(changed_user.authentication_modes).to eq [choice]
 
       user.first_name = name
+      user.authentication_modes = modes
       @domain.create_users([user])
       reverted_user = @domain.get_user(login)
       expect(reverted_user.first_name).to eq name
+      expect(reverted_user.authentication_modes).to eq modes
     end
 
     it 'Fails with an exception if you try to create a user that is in a different domain' do
@@ -121,16 +130,24 @@ describe GoodData::Domain do
     end
 
     it 'updates properties of a profile' do
+      pending 'Add more users'
+
       user = @domain.users
         .reject { |u| u.login == ConnectionHelper::DEFAULT_USERNAME }.sample
 
       old_email = user.email
+      old_sso_provider = user.sso_provider || ''
       user.email = 'john.doe@gooddata.com'
+      user.sso_provider = user.sso_provider.blank? ? user.sso_provider.reverse : 'some_sso_provider'
       @domain.update_user(user)
-      expect(@domain.get_user(user.login).email).to eq 'john.doe@gooddata.com'
-      user.email = old_email
-      @domain.update_user(user)
-      expect(@domain.get_user(user.login).email).to eq old_email
+      updated_user = @domain.find_user_by_login(user.login)
+      expect(updated_user.email).to eq 'john.doe@gooddata.com'
+      expect(updated_user.sso_provider).to eq 'some_sso_provider'
+      updated_user.email = old_email
+      updated_user.sso_provider = old_sso_provider
+      @domain.update_user(updated_user)
+      expect(@domain.find_user_by_login(user.login).email).to eq old_email
+      expect(@domain.find_user_by_login(user.login).sso_provider).to eq old_sso_provider
     end
   end
 end
