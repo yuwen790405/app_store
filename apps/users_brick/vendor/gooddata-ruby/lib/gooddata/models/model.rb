@@ -7,7 +7,6 @@ require_relative 'metadata/metadata'
 require_relative 'links'
 require_relative 'module_constants'
 require_relative 'user_filters/user_filters'
-require_relative 'blueprint/blueprint'
 
 require 'fileutils'
 require 'multi_json'
@@ -20,88 +19,50 @@ require 'zip'
 #
 module GoodData
   module Model
-    # See https://confluence.intgdc.com/display/plat/Catalog+of+Attribute+Types
-    GD_TYPES = [
-      # Common Types
-      'GDC.link',
-      'GDC.text',
-      'GDC.time',
-
-      # Common Date Attribute Types
-      'GDC.time.year',
-      'GDC.time.quarter',
-      'GDC.time.month',
-      'GDC.time.week',
-      'GDC.time.date',
-
-      # Specific Date Attribute Types
-      'GDC.time.day_in_euweek',
-      'GDC.time.day_in_week',
-      'GDC.time.day_in_month',
-      'GDC.time.day_in_quarter',
-      'GDC.time.day_in_year',
-      'GDC.time.euweek_in_quarter',
-      'GDC.time.week_in_quarter',
-      'GDC.time.euweek_in_year',
-      'GDC.time.week_in_year',
-      'GDC.time.month_in_quarter',
-      'GDC.time.month_in_year',
-      'GDC.time.quarter_in_year',
-
-      # Legacy Date Attribute Types - Possibly Obsolete
-      'GDC.time.dayOfWeek',
-      'GDC.time.dayOfMonth',
-      'GDC.time.dayOfQuarter',
-      'GDC.time.dayOfYear',
-      'GDC.time.weekOfYear',
-      'GDC.time.monthOfYear',
-      'GDC.time.quarterOfYear',
-
-      # Types for Geo
-      'GDC.geo.pin',                 # Geo pushpin
-      'GDC.geo.ausstates.name',      # Australia States (Name)
-      'GDC.geo.ausstates.code',      # Australia States (ISO code)
-      'GDC.geo.usstates.name',       # US States (Name)
-      'GDC.geo.usstates.geo_id',     # US States (US Census ID)
-      'GDC.geo.usstates.code',       # US States (2-letter code)
-      'GDC.geo.uscounties.geo_id',   # US Counties (US Census ID)
-      'GDC.geo.worldcountries.name', # World countries (Name)
-      'GDC.geo.worldcountries.iso2', # World countries (ISO a2)
-      'GDC.geo.worldcountries.iso3', # World countries (ISO a3)
-      'GDC.geo.czdistricts.name',    #	Czech Districts (Name)
-      'GDC.geo.czdistricts.name_no_diacritics', # Czech Districts
-      'GDC.geo.czdistricts.nuts4',   # Czech Districts (NUTS 4)
-      'GDC.geo.czdistricts.knok',    # Czech Districts (KNOK)
-
-      # Day Display Forms
-      'GDC.time.day',              # yyyy-MM-dd
-      'GDC.time.day_us',           # MM/dd/yyyy
-      'GDC.time.day_eu',           # dd/MM/yyyy
-      'GDC.time.day_iso',          # dd-MM-yyyy
-      'GDC.time.day_us_long',      # EEE, MMM d, yyyy
-      'GDC.time.day_us_noleading', # M/d/yy
-    ]
-
+    GD_TYPES = %w(GDC.link GDC.text GDC.geo GDC.time)
     GD_DATA_TYPES = ['BIGINT', 'DOUBLE', 'INTEGER', 'INT', /^VARCHAR\(\d{1,3}\)$/i, /^DECIMAL\(\d{1,3},\s*\d{1,3}\)$/i]
 
     DEFAULT_FACT_DATATYPE = 'DECIMAL(12,2)'
-    DEFAULT_ATTRIBUTE_DATATYPE = 'VARCHAR(128)'
-
-    DEFAULT_TYPE = 'GDC.text'
-
     DEFAULT_DATE_FORMAT = 'MM/dd/yyyy'
 
     class << self
       def title(item)
-        item[:title] || item[:id].titleize
-      end
-
-      def column_name(item)
-        item[:column_name] || item[:id]
+        item[:title] || item[:name].titleize
       end
 
       def description(item)
         item[:description]
+      end
+
+      def identifier_for(dataset, column = nil, column2 = nil) # rubocop:disable UnusedMethodArgument
+        return "dataset.#{dataset[:name]}" if column.nil?
+        column = DatasetBlueprint.find_column_by_name(dataset, column) if column.is_a?(String)
+        case column[:type].to_sym
+        when :anchor_no_label
+          "attr.#{dataset[:name]}.factsof"
+        when :attribute
+          "attr.#{dataset[:name]}.#{column[:name]}"
+        when :anchor
+          "attr.#{dataset[:name]}.#{column[:name]}"
+        when :date_fact
+          "dt.#{dataset[:name]}.#{column[:name]}"
+        when :fact
+          "fact.#{dataset[:name]}.#{column[:name]}"
+        when :primary_label
+          "label.#{dataset[:name]}.#{column[:name]}"
+        when :label
+          "label.#{dataset[:name]}.#{column[:reference]}.#{column[:name]}"
+        when :date_ref
+          "#{dataset[:name]}.date.mdyy"
+        when :dataset
+          "dataset.#{dataset[:name]}"
+        when :date
+          'DATE'
+        when :reference
+          'REF'
+        else
+          fail "Unknown type #{column[:type].to_sym}"
+        end
       end
 
       def check_gd_type(value)
@@ -225,14 +186,8 @@ module GoodData
         d = a_schema_blueprint.deep_dup
         d[:columns] = d[:columns] + b_schema_blueprint[:columns]
         d[:columns].uniq!
-        columns_that_failed_to_merge = d[:columns].group_by { |x| [:reference, :date].include?(x[:type]) ? x[:dataset] : x[:id] }.map { |k, v| [k, v.count, v] }.select { |x| x[1] > 1 }
-        unless columns_that_failed_to_merge.empty?
-          columns_that_failed_to_merge.each do |error|
-            GoodData.logger.error "Columns #{error[0]} failed to merge. There are #{error[1]} conflicting columns. When merging columns with the same name they have to be identical."
-            GoodData.logger.error error[2]
-          end
-          fail "Columns #{columns_that_failed_to_merge.first} failed to merge. There are #{columns_that_failed_to_merge[1]} conflicting columns. #{columns_that_failed_to_merge[2]} When merging columns with the same name they have to be identical." unless columns_that_failed_to_merge.empty?
-        end
+        columns_that_failed_to_merge = d[:columns].group_by { |x| x[:name] }.map { |k, v| [k, v.count] }.select { |x| x[1] > 1 }
+        fail "Columns #{columns_that_failed_to_merge} failed to merge. When merging columns with the same name they have to be identical." unless columns_that_failed_to_merge.empty?
         d
       end
     end

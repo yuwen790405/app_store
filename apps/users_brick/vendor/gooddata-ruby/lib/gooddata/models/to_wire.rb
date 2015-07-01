@@ -18,7 +18,7 @@ module GoodData
           {
             attribute: {
               identifier: GoodData::Model.identifier_for(dataset, type: :anchor_no_label),
-              title: "Records of #{ GoodData::Model.title(dataset) }",
+              title: "Records of #{GoodData::Model.title(dataset)}",
               folder: dataset[:folder] || GoodData::Model.title(dataset)
             }
           }
@@ -55,7 +55,7 @@ module GoodData
                   identifier: GoodData::Model.identifier_for(dataset, l, attribute),
                   title: GoodData::Model.title(l),
                   type: l[:gd_type],
-                  dataType: l[:gd_data_type]
+                  dataType: GoodData::Model.normalize_gd_data_type(l[:gd_data_type])
                 }
               }
             end,
@@ -110,7 +110,7 @@ module GoodData
             identifier: GoodData::Model.identifier_for(dataset, fact),
             title: GoodData::Model.title(fact),
             folder: fact[:folder] || dataset[:folder] || GoodData::Model.title(dataset),
-            dataType: fact[:gd_data_type] || DEFAULT_FACT_DATATYPE
+            dataType: GoodData::Model.normalize_gd_data_type(fact[:gd_data_type]) || DEFAULT_FACT_DATATYPE
           }
         }
         payload.tap do |p|
@@ -124,7 +124,6 @@ module GoodData
       # @param dataset [Hash] Dataset blueprint hash represenation
       # @return [Hash] Manifest for a particular reference
       def self.references_to_wire(project, dataset)
-        binding.pry
         DatasetBlueprint.references(dataset).map do |r|
           if ProjectBlueprint.date_dimension?(project, r[:dataset])
             ProjectBlueprint.find_date_dimension(project, r[:dataset])[:name]

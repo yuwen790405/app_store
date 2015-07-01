@@ -16,7 +16,6 @@ require_relative '../mixins/rest_resource'
 
 require_relative 'process'
 require_relative 'project_role'
-require_relative 'blueprint/blueprint'
 
 module GoodData
   class Project < GoodData::Rest::Resource
@@ -240,9 +239,7 @@ module GoodData
       result = client.get("/gdc/projects/#{pid}/model/view")
       polling_url = result['asyncTask']['link']['poll']
       model = client.poll_on_code(polling_url, options)
-      bp = GoodData::Model::FromWire.from_wire(model)
-      bp.title = title
-      bp
+      GoodData::Model::FromWire.from_wire(model)
     end
 
     # Returns web interface URI of project

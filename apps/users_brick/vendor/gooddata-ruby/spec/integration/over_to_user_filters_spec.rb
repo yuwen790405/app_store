@@ -2,44 +2,48 @@ require 'gooddata'
 
 describe "Variables implementation", :constraint => 'slow' do
   before(:all) do
-    @spec = JSON.parse(File.read("./spec/data/blueprints/m_n_model.json"), :symbolize_names => true)
+    @spec = JSON.parse(File.read("./spec/data/m_n_model/blueprint.json"), :symbolize_names => true)
     @client = ConnectionHelper::create_default_connection
-    @blueprint = GoodData::Model::ProjectBlueprint.new(@spec)
-    @project = @client.create_project_from_blueprint(@blueprint, :auth_token => ConnectionHelper::GD_PROJECT_TOKEN)
+    @project = @client.create_project_from_blueprint(@spec, :auth_token => ConnectionHelper::GD_PROJECT_TOKEN)
     @domain = @client.domain(ConnectionHelper::DEFAULT_DOMAIN)
-    @label = @project.attributes('attr.permission.id').label_by_name('label.permission.id.email')
 
-    data = [
-      ['label.commits.id', 'fact.commits.lines_changed', 'dataset.users'],
+    @label = GoodData::Attribute.find_first_by_title('Perm User', client: @client, project: @project).label_by_name('email')
+
+    @blueprint = GoodData::Model::ProjectBlueprint.new(@spec)
+    commits_data = [
+      ['commit_id', 'lines_changed', 'user_id'],
       [1, 1, 1],
       [2, 3, 2],
       [3, 5, 3]]
-    @project.upload(data, @blueprint, 'dataset.commits')
-    
-    data = [
-      ["label.users.id", "label.users.id.email"],
+    GoodData::Model.upload_data(commits_data, @blueprint, 'commits', :client => @client, :project => @project)
+    # blueprint.find_dataset('commits').upload(commits_data)
+
+    devs_data = [
+      ["user_id", "email"],
       [1, "tomas@gooddata.com"],
       [2, "petr@gooddata.com"],
       [3, "jirka@gooddata.com"]]
-    @project.upload(data, @blueprint, 'dataset.users')
+    GoodData::Model.upload_data(devs_data, @blueprint, 'users', :client => @client, :project => @project)
 
-    data = [
-      ["label.permission.id", "label.permission.id.email"],
+    devs_data = [
+      ["perm_user_id", "email"],
       [1, "tomas@gooddata.com"],
       [2, "petr@gooddata.com"],
       [3, "jirka@gooddata.com"]]
-    @project.upload(data, @blueprint, 'dataset.permission_users')
+    GoodData::Model.upload_data(devs_data, @blueprint, 'permission_users', :client => @client, :project => @project)
+    # blueprint.find_dataset('devs').upload(devs_data)
 
-    data = [
-      ['label.visibility.id', 'dataset.permission_users', 'dataset.commits'],
+    devs_data = [
+      ['visibility_id', 'perm_user_id', 'commit_id'],
       [1, 1, 1],
+      # [2, 1, 2],
       [3, 1, 3]]
-    @project.upload(data, @blueprint, 'dataset.visibility')
+    GoodData::Model.upload_data(devs_data, @blueprint, 'visibility', :client => @client, :project => @project)
 
     @variable = @project.create_variable(title: 'uaaa', attribute: @label.attribute).save
 
-    @attr1 = @project.attributes('attr.visibility.id')
-    @attr2 = @project.attributes('attr.commits.id')
+    @attr1 = GoodData::Attribute.find_first_by_title('Visibility', client: @client, project: @project)
+    @attr2 = GoodData::Attribute.find_first_by_title('Commit', client: @client, project: @project)
 
     @filters = [
       {
@@ -66,21 +70,21 @@ describe "Variables implementation", :constraint => 'slow' do
   end
 
   it "should create an over to filter transparently" do    
-    metric = @project.create_metric("SELECT SUM(#\"Fact.Commits.Lines Changed\")", :title => 'x')
+    metric = @project.create_metric("SELECT SUM(#\"Lines Changed\")", :title => 'x')
     expect(metric.execute).to eq 9
     @project.add_data_permissions(@filters)
     expect(metric.execute).to eq 6
 
-    r = @project.compute_report(left: [metric], top: ['label.users.id.email'])
+    r = @project.compute_report(left: [metric], top: @project.attributes('attr.users.user_id'))
     expect(r.include_column?(['tomas@gooddata.com', 1])).to eq true
     expect(r.include_column?(['jirka@gooddata.com', 5])).to eq true
     expect(r.include_column?(['petr@gooddata.com', 3])).to eq false
 
-    data = [['label.visibility.id', 'dataset.permission_users', 'dataset.commits'], [1, 1, 1]]
-    @project.upload(data, @blueprint, 'dataset.visibility')
+    devs_data = [['visibility_id', 'perm_user_id', 'commit_id'], [1, 1, 1]]
+    GoodData::Model.upload_data(devs_data, @blueprint, 'visibility', :client => @client, :project => @project)
 
     expect(metric.execute).to eq 1
-    r = @project.compute_report(left: [metric], top: ['label.users.id.email'])
+    r = @project.compute_report(left: [metric], top: @project.attributes('attr.users.user_id'))
     expect(r.include_column?(['tomas@gooddata.com', 1])).to eq true
     expect(r.include_column?(['jirka@gooddata.com', 5])).to eq false
     expect(r.include_column?(['petr@gooddata.com', 3])).to eq false
