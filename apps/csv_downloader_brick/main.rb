@@ -5,9 +5,9 @@ require 'fileutils'
 fetch_gems = true
 
 repo_gems = [
-  'https://github.com/gooddata/gooddata_connectors_base/archive/s3.zip',
-  'https://github.com/gooddata/gooddata_connectors_metadata/archive/bds_implementation.zip',
-  'https://github.com/korczis/gooddata_connectors_downloader_csv/archive/master.zip'
+  'https://gdc-ms-ruby-packages.s3.amazonaws.com/gooddata_connectors_base/s3.zip',
+  'https://gdc-ms-ruby-packages.s3.amazonaws.com/gooddata_connectors_metadata/bds_implementation.zip',
+  'https://gdc-ms-ruby-packages.s3.amazonaws.com/gooddata_connectors_downloader_csv/master.zip'
 ]
 
 if fetch_gems
@@ -42,6 +42,8 @@ require 'gooddata_connectors_downloader_csv'
 
 # Require executive brick
 require_relative 'execute_brick'
+
+FileUtils.mkdir_p('tmp')
 
 include GoodData::Bricks
 

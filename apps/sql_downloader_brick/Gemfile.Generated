@@ -1,9 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'json','1.8.1'
-gem 'ffi','1.9.3'
-gem 'gooddata','0.6.12'
-gem 'rubyzip','1.1.6'
-gem 'gooddata_connectors_base',  :path => './vendor/gems/gooddata_connectors_base'
-gem 'gooddata_connectors_metadata',  :path => './vendor/gems/gooddata_connectors_metadata'
-gem 'gooddata_connectors_downloader_sql',  :path => './vendor/gems/gooddata_connectors_downloader_sql'
