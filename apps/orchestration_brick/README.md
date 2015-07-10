@@ -94,3 +94,26 @@ Example output when times are rough (each schedule had 50 percent chance of fail
     Running ["e", ["c", "d"], {"retries"=>3}]
     Process finished "e" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ce4b0e23e7b74cfc2/executions/559f57bbe4b0e23e7b74d287
     Definition succesfully executed
+
+### Visualizing the graph
+
+Picture is worth a thousand words. It is very easy to turn the definition in something more visual. This simple graphs will produce this result
+
+    require 'graphviz'
+
+    definition = [
+      ["a", []],
+      ["b", ["a"]],
+      ["c", ["b"]],
+      ["d", ["b"]],
+      ["e", ["c", "d"]]
+    ]
+
+    g = GraphViz.new( :G, :type => :digraph , :rankdir => 'BT')
+    definition.each { |rule| g.add_nodes( rule.first ) }
+    definition.each { |rule| rule[1].each { |dep| g.add_edges(rule.first, dep) } }
+    g.output( :png => "run_dag.png" )
+
+![Schedule DAG](https://www.dropbox.com/s/fj5burfpo0vho2w/run_dag.png?dl=0&raw=1)
+
+Just note you have to install the correct dependenecies. You have to install graphviz [http://www.graphviz.org/](http://www.graphviz.org/) and ruby library [Ruby Graphviz](https://github.com/glejeune/Ruby-Graphviz)
