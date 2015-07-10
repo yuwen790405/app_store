@@ -12,6 +12,7 @@ This brick allows you to declaratively state the order of execution of processes
 
 ## Todo
 - global retry specification
+- handle case with cycle
 
 ### Preconditions
 This brick currently works with names of schedules. There are couple of preconditions you have to fulfil
