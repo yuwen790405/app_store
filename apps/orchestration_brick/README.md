@@ -28,68 +28,68 @@ Let's have a look at real example. Let's say you have several schedules in your 
 
 This can be translated in the following rules
 
-  [
-    ["a", []],
-    ["b", ["a"]],
-    ["c", ["b"]],
-    ["d", ["b"]],
-    ["e", ["c", "d"]]
-  ]
-
-Take note that the order of the rules does not matter. This definition is expected to be passed as "definition" key into the params
-
-  "params": {
-    "definition": [
+    [
       ["a", []],
       ["b", ["a"]],
       ["c", ["b"]],
       ["d", ["b"]],
       ["e", ["c", "d"]]
     ]
-  }
+
+Take note that the order of the rules does not matter. This definition is expected to be passed as "definition" key into the params
+
+    "params": {
+      "definition": [
+        ["a", []],
+        ["b", ["a"]],
+        ["c", ["b"]],
+        ["d", ["b"]],
+        ["e", ["c", "d"]]
+      ]
+    }
 
 Here is an example output when running this brick.
 
-  Running ["a", []]
-  Process finished "a" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f5159e4b04dc2ca9dbd78/executions/559f52aee4b0e23e7b74d11c
-  Running ["b", ["a"]]
-  Process finished "b" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b0e23e7b74cfc1/executions/559f52b9e4b04dc2ca9dbd83
-  Running ["c", ["b"]]
-  Running ["d", ["b"]]
-  Process finished "c" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b04dc2ca9dbd79/executions/559f52c3e4b0e23e7b74d11d
-  Process finished "d" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515be4b04dc2ca9dbd7a/executions/559f52c4e4b0e23e7b74d11e
-  Running ["e", ["c", "d"]]
-  Process finished "e" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ce4b0e23e7b74cfc2/executions/559f52d9e4b04dc2ca9dbd84
-  Definition succesfully executed
+    Running ["a", []]
+    Process finished "a" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f5159e4b04dc2ca9dbd78/executions/559f52aee4b0e23e7b74d11c
+    Running ["b", ["a"]]
+    Process finished "b" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b0e23e7b74cfc1/executions/559f52b9e4b04dc2ca9dbd83
+    Running ["c", ["b"]]
+    Running ["d", ["b"]]
+    Process finished "c" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b04dc2ca9dbd79/executions/559f52c3e4b0e23e7b74d11d
+    Process finished "d" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515be4b04dc2ca9dbd7a/executions/559f52c4e4b0e23e7b74d11e
+    Running ["e", ["c", "d"]]
+    Process finished "e" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ce4b0e23e7b74cfc2/executions/559f52d9e4b04dc2ca9dbd84
+    Definition succesfully executed
 
 ### Dealing with failure
 Processes occasionally fail. You can specify number of attempts it should be retried before failure. If we use the previous example again it might look like this.
 
 
-  "params": {
-    "definition": [
-      ["a", [], { "retries" : 3}],
-      ["b", ["a"], { "retries" : 3}],
-      ["c", ["b"], { "retries" : 3}],
-      ["d", ["b"], { "retries" : 3}],
-      ["e", ["c", "d"], { "retries" : 3}]
-    ]
-  }
+    "params": {
+      "definition": [
+        ["a", [], { "retries" : 3}],
+        ["b", ["a"], { "retries" : 3}],
+        ["c", ["b"], { "retries" : 3}],
+        ["d", ["b"], { "retries" : 3}],
+        ["e", ["c", "d"], { "retries" : 3}]
+      ]
+    }
 
 Example output when times are rough (each schedule had 50 percent chance of failure) might look like this
 
-  Running ["a", [], {"retries"=>3}]
-  Process "a" failed. Restarting process. Attempt 2.
-  Process "a" failed. Restarting process. Attempt 3.
-  Process finished "a" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f5159e4b04dc2ca9dbd78/executions/559f5716e4b0e23e7b74d257
-  Running ["b", ["a"], {"retries"=>3}]
-  Process "b" failed. Restarting process. Attempt 2.
-  Process finished "b" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b0e23e7b74cfc1/executions/559f5735e4b04dc2ca9dbdd6
-  Running ["c", ["b"], {"retries"=>3}]
-  Running ["d", ["b"], {"retries"=>3}]
-  Process finished "c" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b04dc2ca9dbd79/executions/559f5740e4b0e23e7b74d26d
-  Process "d" failed. Restarting process. Attempt 2.
-  Process finished "d" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515be4b04dc2ca9dbd7a/executions/559f5769e4b04dc2ca9dbdd7
-  Running ["e", ["c", "d"], {"retries"=>3}]
-  Process finished "e" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ce4b0e23e7b74cfc2/executions/559f57bbe4b0e23e7b74d287
-  Definition succesfully executed
+    Running ["a", [], {"retries"=>3}]
+    Process "a" failed. Restarting process. Attempt 2.
+    Process "a" failed. Restarting process. Attempt 3.
+    Process finished "a" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f5159e4b04dc2ca9dbd78/executions/559f5716e4b0e23e7b74d257
+    Running ["b", ["a"], {"retries"=>3}]
+    Process "b" failed. Restarting process. Attempt 2.
+    Process finished "b" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b0e23e7b74cfc1/executions/559f5735e4b04dc2ca9dbdd6
+    Running ["c", ["b"], {"retries"=>3}]
+    Running ["d", ["b"], {"retries"=>3}]
+    Process finished "c" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ae4b04dc2ca9dbd79/executions/559f5740e4b0e23e7b74d26d
+    Process "d" failed. Restarting process. Attempt 2.
+    Process finished "d" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515be4b04dc2ca9dbd7a/executions/559f5769e4b04dc2ca9dbdd7
+    Running ["e", ["c", "d"], {"retries"=>3}]
+    Process finished "e" /gdc/projects/wl3oo0dry05rkebwgc9awtlxo8fhjauw/schedules/559f515ce4b0e23e7b74cfc2/executions/559f57bbe4b0e23e7b74d287
+    Definition succesfully executed
