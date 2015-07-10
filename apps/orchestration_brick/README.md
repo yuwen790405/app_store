@@ -109,10 +109,10 @@ Picture is worth a thousand words. It is very easy to turn the definition in som
       ["e", ["c", "d"]]
     ]
 
-    g = GraphViz.new( :G, :type => :digraph , :rankdir => 'BT')
-    definition.each { |rule| g.add_nodes( rule.first ) }
+    g = GraphViz.new(:G, :type => :digraph , :rankdir => 'BT')
+    definition.each { |rule| g.add_nodes(rule.first) }
     definition.each { |rule| rule[1].each { |dep| g.add_edges(rule.first, dep) } }
-    g.output( :png => "run_dag.png" )
+    g.output(:png => "run_dag.png")
 
 ![Schedule DAG](https://www.dropbox.com/s/fj5burfpo0vho2w/run_dag.png?dl=0&raw=1)
 
