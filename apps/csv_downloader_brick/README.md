@@ -92,7 +92,7 @@ The structure of the file should look like this:
  * decimal(16,10) - numeric
  * boolean - boolean
  * Date without time - date,time-false
- * Data with time - time,time-true,timestamp without time zone
+ * Date with time - time,time-true,timestamp without time zone
 
 All other types are threaded as string-255
 
