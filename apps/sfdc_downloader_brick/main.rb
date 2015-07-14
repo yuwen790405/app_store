@@ -34,7 +34,7 @@ FileUtils.mkdir_p('output')
 
 # Bundler hack
 require 'bundler/cli'
-Bundler::CLI.new.invoke(:install, [],:path => "gems",:jobs => 4,:retry => 3)
+Bundler::CLI.new.invoke(:install, [],:path => "gems",:jobs => 4,:retry => 3,:deployment => true)
 
 # Required gems
 require 'bundler/setup'
