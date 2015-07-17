@@ -1,17 +1,3 @@
-module GoodData
-  class Schedule
-    # Executes schedule
-    #
-    # @return [Object] Raw Response
-    def execute_no_wait
-      data = {
-          :execution => {}
-      }
-      execution = client.post(execution_url, data)
-    end
-  end
-end
-
 module GoodData::Bricks
 
   class ExecuteBrick < GoodData::Bricks::Brick
@@ -54,7 +40,7 @@ module GoodData::Bricks
             begin
               tries ||= 5
               logger.info "Starting schedule for project #{hash[:project].pid} - #{hash[:project].title}. Schedule ID is #{hash[:schedule].obj_id}"
-              hash[:schedule].execute_no_wait
+              hash[:schedule].execute(wait: false)
             rescue => e
               if (tries -= 1) > 0
                 logger.warn "There was error during operation: #{e.message}. Retrying"
