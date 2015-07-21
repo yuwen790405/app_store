@@ -4,6 +4,7 @@ require 'gooddata'
 require './user_hierarchies/lib/user_hierarchies'
 require './overflow_hash'
 require 'zip'
+require 'net/dav'
 
 # Share id has to be named ObjectId
 # Role Id has to be named RoleId
@@ -33,6 +34,7 @@ module GoodData::Bricks
       group_members_filename = params['group_members_filename'] || 'GroupMember.csv'
       permissions_filename = params['permissions_filename'] || 'ObjectPermissions.csv'
       permission_sets_filename = params['permission_sets_filename'] || 'PermissionSet.csv'
+      users_filter_filename = params['users_filter_filename']
 
       to_process = params['to_process']
 
@@ -45,6 +47,14 @@ module GoodData::Bricks
       permission = CSV.parse(File.open(permissions_filename, 'r:UTF-8').read, csv_params)
       permission_set = CSV.parse(File.open(permission_sets_filename, 'r:UTF-8').read, csv_params)
 
+      $users_filter_lookup = {}
+      if users_filter_filename && File.exist?(users_filter_filename)
+        CSV.foreach(File.open(users_filter_filename, 'r:UTF-8'), csv_params) do |user|
+          key = user['Id']
+          $users_filter_lookup[key] = 1
+        end
+      end
+
       $group_lookup = GoodData::Helpers.create_lookup(groups, 'Id')
       $group_members_lookup = GoodData::Helpers.create_lookup(group_members, 'GroupId')
       roles.each {|x| x['RoleId'] = x['Id']}
@@ -54,7 +64,6 @@ module GoodData::Bricks
       merged_permissions_users = GoodData::Helpers.join(users, merged_permissions, ['ProfileId'], ['ProfileId'])
       filtered_permission_user = merged_permissions_users.select { |x| x['PermissionsViewAllRecords'] == 'true' }
       super_users = filtered_permission_user.select {|u| u['IsActive'] == 'true'}
-
       
       $user_hieararchy = GoodData::UserHierarchies::UserHierarchy.build_hierarchy(merged_users, {
         :hashing_id => :Id,
@@ -100,16 +109,18 @@ module GoodData::Bricks
           stuff = resolve_share_or_group_member(share,nil)
           # if count % 1000 == 0
 
-          stuff.select {|x| x.IsActive == 'true'}.each do |x|
-            if deduplicate
-              unless visibility.key?([x.Id, share[share_id_field]].join)
-                csv << [x.Id, share[share_id_field]]
-                visibility[[x.Id, share[share_id_field]].join] = "1"
-              end
-            else
-              csv << [x.Id, share[share_id_field]]
-            end
-          end
+          stuff.select { |x| x.IsActive == 'true' }
+               .select { |x| $users_filter_lookup.empty? ? true : $users_filter_lookup.key?(x.Id) }
+               .each do |x|
+                      if deduplicate
+                        unless visibility.key?([x.Id, share[share_id_field]].join)
+                          csv << [x.Id, share[share_id_field]]
+                          visibility[[x.Id, share[share_id_field]].join] = "1"
+                        end
+                      else
+                        csv << [x.Id, share[share_id_field]]
+                      end
+                    end
           nil
         end
 
@@ -120,16 +131,18 @@ module GoodData::Bricks
         CSV.foreach(File.open(objects_filename, 'r:UTF-8'), csv_params) do |row|
           count += 1
           puts count if count % 1000 == 0
-          filtered_super_users.each do |u|
-            if deduplicate
-              unless visibility.key?([u['Id'], row['Id']].join)
+          filtered_super_users
+            .select { |u| $users_filter_lookup.empty? ? true : $users_filter_lookup.key?(u['Id']) }
+            .each do |u|
+              if deduplicate
+                unless visibility.key?([u['Id'], row['Id']].join)
+                  csv << [u['Id'], row['Id']]
+                  visibility[[u['Id'], row['Id']].join] = "1"
+                end
+              else
                 csv << [u['Id'], row['Id']]
-                visibility[[u['Id'], row['Id']].join] = "1"
               end
-            else
-              csv << [u['Id'], row['Id']]
             end
-          end
         end
       end
       
@@ -162,14 +175,11 @@ module GoodData::Bricks
           ($role_lookup[group['RelatedId']] || []) # WHAT IF role doesnt include any users but there are users in manager role and group should include bosses?
         when 'RoleAndSubordinates'
           ($role_lookup[group['RelatedId']] || []).mapcat {|u| u.all_subordinates_with_self}
-        # !! ADD Internal
         when 'RoleAndSubordinatesInternal'
           $role_lookup[group['RelatedId']].select {|u| ['None', 'Standard'].include?(u.PortalType)}.map {|u| $user_hieararchy.find_by_id(u[:Id])}.mapcat {|u| u.all_subordinates_with_self }.select {|u| ['None', 'Standard'].include?(u.PortalType) }
         else
           members = $group_members_lookup[group['Id']] || []
-          # puts "Mapcating"
           res = members.mapcat {|member| resolve_share_or_group_member(member,includeBosses)}
-          # puts "done"
           res
         end
       x = includeBosses == 'true' ? users_to_resolve.mapcat { |u| u.all_managers_with_self } : users_to_resolve
@@ -178,7 +188,7 @@ module GoodData::Bricks
       y
     end
 
-    def resolve_share_or_group_member(obj,includeBosses)
+    def resolve_share_or_group_member(obj, includeBosses)
       id = obj['UserOrGroupId']
       is_user = user?($user_hieararchy, id)
       if is_user
